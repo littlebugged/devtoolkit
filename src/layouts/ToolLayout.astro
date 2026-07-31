@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import AdBanner from '../components/AdBanner.astro';
 import type { Tool } from '../data/tools';
 import { tools } from '../data/tools';
 
@@ -44,9 +45,7 @@ const structuredData = {
     </nav>
 
     <!-- Top Ad -->
-    <div class="ad-container ad-top" id="ad-top">
-      <span class="ad-label">Advertisement</span>
-    </div>
+    <AdBanner id="ad-top" class="ad-top" />
 
     <div class="tool-header">
       <h1>{tool.name}</h1>
@@ -57,10 +56,8 @@ const structuredData = {
       <slot />
     </div>
 
-    <!-- Middle Ad (between tool and info) -->
-    <div class="ad-container ad-middle" id="ad-middle">
-      <span class="ad-label">Advertisement</span>
-    </div>
+    <!-- Middle Ad -->
+    <AdBanner id="ad-middle" class="ad-middle" />
 
     <!-- SEO Content (collapsed by default, search engines still read it) -->
     <details class="tool-info-accordion">
@@ -69,9 +66,7 @@ const structuredData = {
     </details>
 
     <!-- Bottom Ad -->
-    <div class="ad-container ad-bottom" id="ad-bottom">
-      <span class="ad-label">Advertisement</span>
-    </div>
+    <AdBanner id="ad-bottom" class="ad-bottom" />
 
     {relatedTools.length > 0 && (
       <div class="related-tools">

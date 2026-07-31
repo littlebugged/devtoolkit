@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AdBanner from '../components/AdBanner.astro';
 import { categories, tools, getToolsByCategory } from '../data/tools';
 ---
 
@@ -14,9 +15,7 @@ import { categories, tools, getToolsByCategory } from '../data/tools';
   </div>
 
   <!-- Top Ad -->
-  <div class="ad-container ad-top" id="ad-home-top">
-    <span class="ad-label">Advertisement</span>
-  </div>
+  <AdBanner id="ad-home-top" class="ad-top" />
 
   {categories.map(cat => {
     const catTools = getToolsByCategory(cat.id);
@@ -41,9 +40,7 @@ import { categories, tools, getToolsByCategory } from '../data/tools';
   })}
 
   <!-- Bottom Ad -->
-  <div class="ad-container ad-bottom" id="ad-home-bottom">
-    <span class="ad-label">Advertisement</span>
-  </div>
+  <AdBanner id="ad-home-bottom" class="ad-bottom" />
 
   <!-- FAQ Schema: invisible to users, readable by Google for rich snippets -->
   <script type="application/ld+json" set:html={JSON.stringify({
