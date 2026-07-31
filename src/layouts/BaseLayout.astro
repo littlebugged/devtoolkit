@@ -50,8 +50,6 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Adsterra global ad (popunder/social bar) -->
-  <script is:inline src="https://pl30613587.effectivecpmnetwork.com/b2/19/e0/b219e04b0e76ad939e61f83b271f5d1a.js"></script>
 </head>
 <body>
   <header class="site-header">
@@ -97,5 +95,8 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
       navigator.clipboard.writeText(text).then(() => showToast());
     }
   </script>
+
+  <!-- Adsterra global ad (popunder/social bar) - loaded async at end of body -->
+  <script is:inline async src="https://pl30613587.effectivecpmnetwork.com/b2/19/e0/b219e04b0e76ad939e61f83b271f5d1a.js"></script>
 </body>
 </html>
