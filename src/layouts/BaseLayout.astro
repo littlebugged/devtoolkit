@@ -22,15 +22,24 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
   <script is:inline>
     (function() {
       try {
-        const saved = localStorage.getItem('devtoolkit-theme');
+        var saved = localStorage.getItem('devtoolkit-theme');
+        var mode = 'dark';
         if (saved) {
-          const t = JSON.parse(saved);
-          if (t.mode === 'light') {
-            document.documentElement.classList.add('light');
-            document.documentElement.classList.remove('dark');
+          var t = JSON.parse(saved);
+          if (t.auto) {
+            var h = new Date().getHours();
+            mode = (h >= 6 && h < 18) ? 'light' : 'dark';
+          } else {
+            mode = t.mode || 'dark';
           }
           if (t.color) document.documentElement.setAttribute('data-theme', t.color);
+        } else {
+          var h = new Date().getHours();
+          mode = (h >= 6 && h < 18) ? 'light' : 'dark';
+          localStorage.setItem('devtoolkit-theme', JSON.stringify({ mode: mode, auto: true }));
         }
+        document.documentElement.classList.remove('dark', 'light');
+        document.documentElement.classList.add(mode);
       } catch (_) {}
     })();
   </script>
@@ -147,8 +156,8 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
       const STORAGE_KEY = 'devtoolkit-theme';
       const root = document.documentElement;
 
-      function saveTheme(mode, color) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode, color }));
+      function saveTheme(mode, color, auto) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode: mode, color: color, auto: !!auto }));
       }
 
       function updateModeIcons() {
@@ -169,7 +178,7 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
           const isLight = root.classList.toggle('light');
           root.classList.toggle('dark', !isLight);
           const color = root.getAttribute('data-theme') || 'indigo';
-          saveTheme(isLight ? 'light' : 'dark', color);
+          saveTheme(isLight ? 'light' : 'dark', color, false);
           updateModeIcons();
         });
       });
@@ -187,7 +196,12 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
           const color = dot.dataset.color;
           root.setAttribute('data-theme', color);
           const mode = root.classList.contains('light') ? 'light' : 'dark';
-          saveTheme(mode, color);
+          try {
+            const prev = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            saveTheme(mode, color, prev.auto);
+          } catch (_) {
+            saveTheme(mode, color, false);
+          }
           updateColorDots();
         });
       });
