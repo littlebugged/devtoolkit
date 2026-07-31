@@ -45,7 +45,41 @@ import { categories, tools, getToolsByCategory } from '../data/tools';
   <AdNative id="ad-home-bottom" class="ad-bottom ad-desktop-only" />
   <AdMobile id="ad-home-bottom-mobile" class="ad-bottom ad-mobile-only" />
 
-  <!-- FAQ Schema: invisible to users, readable by Google for rich snippets -->
+  <!-- WebSite Schema for Google Sitelinks Search Box -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'DevToolKit',
+    url: 'https://xxmind.cc.cd',
+    description: 'Free online developer tools — JSON formatter, Base64 encoder, UUID generator, hash generator, and more. All tools run locally in your browser.',
+    inLanguage: 'en',
+    publisher: {
+      '@type': 'Organization',
+      name: 'DevToolKit',
+      url: 'https://xxmind.cc.cd',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://xxmind.cc.cd/favicon.svg',
+      },
+    },
+  })} />
+
+  <!-- ItemList Schema for tool collection -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Free Online Developer Tools',
+    description: 'A collection of free, privacy-focused developer tools that run entirely in your browser.',
+    numberOfItems: tools.length,
+    itemListElement: tools.map((tool, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: tool.name,
+      url: `https://xxmind.cc.cd/tools/${tool.slug}`,
+    })),
+  })} />
+
+  <!-- FAQ Schema: helps machines understand content -->
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',

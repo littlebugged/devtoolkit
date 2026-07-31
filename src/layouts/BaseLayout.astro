@@ -16,9 +16,24 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8" />
+  <script is:inline>
+    (function() {
+      try {
+        const saved = localStorage.getItem('devtoolkit-theme');
+        if (saved) {
+          const t = JSON.parse(saved);
+          if (t.mode === 'light') {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
+          }
+          if (t.color) document.documentElement.setAttribute('data-theme', t.color);
+        }
+      } catch (_) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content={description} />
   {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
@@ -33,17 +48,28 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonicalUrl} />
   <meta property="og:site_name" content={siteName} />
-  {ogImage && <meta property="og:image" content={ogImage} />}
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image" content={ogImage || new URL('/og-default.png', Astro.site).href} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={fullTitle} />
 
   <!-- Twitter -->
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={fullTitle} />
   <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage || new URL('/og-default.png', Astro.site).href} />
 
   <title>{fullTitle}</title>
 
-  <!-- Preconnect to ad network -->
+  <!-- Performance hints -->
   <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+  <link rel="dns-prefetch" href="//www.highperformanceformat.com" />
+  <link rel="dns-prefetch" href="//pl30613587.effectivecpmnetwork.com" />
+
+  <!-- Language / Region -->
+  <link rel="alternate" hreflang="en" href={canonicalUrl} />
+  <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
 
   <!-- Google Fonts - Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -64,6 +90,26 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
           <li><a href="/about">About</a></li>
         </ul>
       </nav>
+      <div class="theme-switcher">
+        <button type="button" class="theme-mode-btn" aria-label="Toggle dark mode">
+          <svg class="theme-mode-icon-dark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <svg class="theme-mode-icon-light" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        </button>
+        <button type="button" class="theme-color-toggle" aria-label="Choose theme color">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="13.5" r="1.5" fill="currentColor"/><circle cx="19" cy="19" r="1.5" fill="currentColor"/><circle cx="10" cy="6" r="1.5" fill="currentColor"/><circle cx="6" cy="10" r="1.5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.05a1.643 1.643 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        </button>
+        <div class="theme-popover" role="dialog" aria-label="Theme colors">
+          <span class="theme-popover-label">Theme color</span>
+          <div class="theme-color-grid">
+            <button type="button" class="theme-color-dot" data-color="indigo" aria-label="Indigo"></button>
+            <button type="button" class="theme-color-dot" data-color="violet" aria-label="Violet"></button>
+            <button type="button" class="theme-color-dot" data-color="cyan" aria-label="Cyan"></button>
+            <button type="button" class="theme-color-dot" data-color="rose" aria-label="Rose"></button>
+            <button type="button" class="theme-color-dot" data-color="emerald" aria-label="Emerald"></button>
+            <button type="button" class="theme-color-dot" data-color="amber" aria-label="Amber"></button>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -94,6 +140,67 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
     function copyText(text) {
       navigator.clipboard.writeText(text).then(() => showToast());
     }
+  </script>
+
+  <script is:inline>
+    (function() {
+      const STORAGE_KEY = 'devtoolkit-theme';
+      const root = document.documentElement;
+
+      function saveTheme(mode, color) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode, color }));
+      }
+
+      function updateModeIcons() {
+        const isLight = root.classList.contains('light');
+        document.querySelectorAll('.theme-mode-icon-dark').forEach(el => el.style.display = isLight ? 'none' : 'block');
+        document.querySelectorAll('.theme-mode-icon-light').forEach(el => el.style.display = isLight ? 'block' : 'none');
+      }
+
+      function updateColorDots() {
+        const current = root.getAttribute('data-theme') || 'indigo';
+        document.querySelectorAll('.theme-color-dot').forEach(dot => {
+          dot.classList.toggle('active', dot.dataset.color === current);
+        });
+      }
+
+      document.querySelectorAll('.theme-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isLight = root.classList.toggle('light');
+          root.classList.toggle('dark', !isLight);
+          const color = root.getAttribute('data-theme') || 'indigo';
+          saveTheme(isLight ? 'light' : 'dark', color);
+          updateModeIcons();
+        });
+      });
+
+      document.querySelectorAll('.theme-color-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const popover = btn.closest('.theme-switcher').querySelector('.theme-popover');
+          popover.classList.toggle('open');
+        });
+      });
+
+      document.querySelectorAll('.theme-color-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+          const color = dot.dataset.color;
+          root.setAttribute('data-theme', color);
+          const mode = root.classList.contains('light') ? 'light' : 'dark';
+          saveTheme(mode, color);
+          updateColorDots();
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.theme-switcher')) {
+          document.querySelectorAll('.theme-popover').forEach(p => p.classList.remove('open'));
+        }
+      });
+
+      updateModeIcons();
+      updateColorDots();
+    })();
   </script>
 
   <!-- Adsterra global ad (popunder/social bar) - loaded async at end of body -->
