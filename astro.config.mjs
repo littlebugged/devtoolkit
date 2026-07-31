@@ -6,6 +6,6 @@ export default defineConfig({
   site: 'https://xxmind.cc.cd',
   integrations: [sitemap()],
   build: {
-    inlineStylesheets: 'auto',
+    inlineStylesheets: 'always',
   },
 });
