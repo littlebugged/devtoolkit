@@ -80,13 +80,13 @@
   },
   "projectFileHashes": {
     "devtoolkit-redesign.design": "e35b734cc3c7ed53a87cca7c23853beb4db7629658e4bdf0488634ea1355c372",
-    "colors_and_type.css": "6818a3252841a25db93aace40cd9378b2db11f366222e039504fdcb38c2746ff",
+    "colors_and_type.css": "4945371d3226d241b32e2417e27ee38c73e2acc6bf20ba590d9a2f9eb3124177",
     "runtime-orchestration-summary.json": "173cf54ecb4b12d64008f457abb5e85902802944ae8e256ce5e52aa15e3d0c18",
-    "pages/index.html": "15f68bd3a52c66ca10564be33708fb8ed5ca9be770bfc1ee52601e012aacca6f",
-    "pages/tool-json-formatter.html": "ed5989d425b17571cc94220036fd6a8ecdd2beee7583171fb21b5964a3316ebb"
+    "pages/index.html": "9608bdc5afed069ca0b69ebddec964998f3760a4ebedcf17c6382a55f68e6366",
+    "pages/tool-json-formatter.html": "bb956487cb6f4aeae82934504898516e56987de36c396db912cc4110b16cd892"
   },
   "designDir": "/Users/zhoudongxu/devtoolkit/devtoolkit-redesign",
-  "expectedPages": 2,
-  "requireInteractions": "nav-home:pages/index.html,nav-tools:pages/index.html,cta-hero:pages/index.html,nav-home:pages/tool-json-formatter.html,nav-tools:pages/tool-json-formatter.html",
-  "checkedAt": "2026-07-31T04:51:34.450Z"
+  "expectedPages": null,
+  "requireInteractions": null,
+  "checkedAt": "2026-07-31T05:30:11.475Z"
 }

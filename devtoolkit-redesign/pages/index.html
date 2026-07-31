@@ -5,12 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevToolKit - Free Online Developer Tools</title>
     <style id="theme-vars">
-/* DevToolKit — premium dark glassmorphism design system for overseas developer tools */
+/* DevToolKit — premium adaptive glassmorphism design system for overseas developer tools */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
+/* ============================================================
+   Theme engine
+   ============================================================ */
+
 :root {
-  /* Primitive palette — one brand hue, no secondary/accent */
+  /* Active theme hue (default: indigo) */
+  --brand-hue: 252;
+  --brand-sat: 100%;
+  --brand-lit: 67%;
+  --brand-lit-light: 58%;
+
+  /* Brand color derived from hue */
+  --brand-primary: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit));
+  --brand-primary-hover: hsl(var(--brand-hue) var(--brand-sat) calc(var(--brand-lit) + 7%));
+  --brand-primary-foreground: #ffffff;
+  --brand-ring: var(--brand-primary);
+  --brand-glow: 0 0 28px hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit) / 0.18);
+  --brand-glow-strong: 0 8px 24px hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit) / 0.28);
+
+  /* Dark mode surfaces (default) */
   --brand-background: #05060f;
   --brand-foreground: #f7f8fc;
 
@@ -20,22 +38,20 @@
   --brand-popover: #0d111c;
   --brand-popover-foreground: #f7f8fc;
 
-  --brand-primary: #7b61ff;
-  --brand-primary-foreground: #ffffff;
-
   --brand-muted: #131725;
   --brand-muted-foreground: #8b92a8;
 
   --brand-border: rgba(255, 255, 255, 0.09);
   --brand-input: #151928;
-  --brand-ring: #7b61ff;
-
-  /* Extended surface tokens */
+  --brand-line: rgba(255, 255, 255, 0.09);
   --brand-surface: #0d111c;
   --brand-surface-2: #151b2b;
-  --brand-line: rgba(255, 255, 255, 0.09);
-  --brand-glow: 0 0 28px rgba(123, 97, 255, 0.18);
 
+  /* Ambient gradient accents */
+  --brand-ambient-a: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit) / 0.12);
+  --brand-ambient-b: rgba(59, 130, 246, 0.06);
+
+  /* Radius */
   --brand-radius-sm: 6px;
   --brand-radius-md: 12px;
   --brand-radius-lg: 16px;
@@ -51,7 +67,7 @@
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
 
-  /* Depth — static shadows stay subtle (<=0.05); deep shadows reserved for floating layers */
+  /* Depth — static shadows stay subtle; deep shadows reserved for floating layers */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.05);
@@ -79,7 +95,89 @@
   --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Base typography resets */
+/* ------------------------------------------------------------
+   Color presets
+   ------------------------------------------------------------ */
+
+[data-theme="indigo"] {
+  --brand-hue: 252;
+  --brand-sat: 100%;
+  --brand-lit: 67%;
+  --brand-lit-light: 58%;
+}
+
+[data-theme="violet"] {
+  --brand-hue: 258;
+  --brand-sat: 95%;
+  --brand-lit: 66%;
+  --brand-lit-light: 57%;
+}
+
+[data-theme="cyan"] {
+  --brand-hue: 189;
+  --brand-sat: 95%;
+  --brand-lit: 55%;
+  --brand-lit-light: 48%;
+}
+
+[data-theme="rose"] {
+  --brand-hue: 346;
+  --brand-sat: 92%;
+  --brand-lit: 60%;
+  --brand-lit-light: 53%;
+}
+
+[data-theme="emerald"] {
+  --brand-hue: 158;
+  --brand-sat: 80%;
+  --brand-lit: 52%;
+  --brand-lit-light: 45%;
+}
+
+[data-theme="amber"] {
+  --brand-hue: 38;
+  --brand-sat: 95%;
+  --brand-lit: 52%;
+  --brand-lit-light: 46%;
+}
+
+/* ------------------------------------------------------------
+   Light mode
+   ------------------------------------------------------------ */
+
+html.light {
+  --brand-primary: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit-light));
+  --brand-primary-hover: hsl(var(--brand-hue) var(--brand-sat) calc(var(--brand-lit-light) + 7%));
+  --brand-ring: var(--brand-primary);
+  --brand-glow: 0 0 28px hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit-light) / 0.14);
+  --brand-glow-strong: 0 8px 24px hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit-light) / 0.22);
+
+  --brand-background: #f7f7fb;
+  --brand-foreground: #11131f;
+
+  --brand-card: rgba(255, 255, 255, 0.72);
+  --brand-card-foreground: #11131f;
+
+  --brand-popover: #ffffff;
+  --brand-popover-foreground: #11131f;
+
+  --brand-muted: #eceef4;
+  --brand-muted-foreground: #5c6275;
+
+  --brand-border: rgba(0, 0, 0, 0.08);
+  --brand-input: #ffffff;
+  --brand-line: rgba(0, 0, 0, 0.08);
+  --brand-surface: rgba(255, 255, 255, 0.72);
+  --brand-surface-2: #eceef4;
+
+  --brand-ambient-a: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit-light) / 0.10);
+  --brand-ambient-b: rgba(59, 130, 246, 0.04);
+}
+
+/* ============================================================
+   Base resets
+   ============================================================ */
+
 html {
   scroll-behavior: smooth;
 }
@@ -101,14 +199,19 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(123, 97, 255, 0.12), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 90%, rgba(59, 130, 246, 0.06), transparent 55%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--brand-ambient-a), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%, var(--brand-ambient-b), transparent 55%);
 }
 
 /* Selection */
 ::selection {
-  background-color: rgba(123, 97, 255, 0.35);
+  background-color: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit) / 0.35);
   color: #ffffff;
+}
+
+html.light ::selection {
+  background-color: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit-light) / 0.22);
+  color: var(--brand-foreground);
 }
 
 /* Focus visibility */
@@ -126,20 +229,23 @@ body::before {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--brand-border);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--brand-muted-foreground);
 }
 
-/* Layout scaffolding */
+/* ============================================================
+   Layout scaffolding
+   ============================================================ */
+
 header {
   position: sticky;
   top: 0;
   height: var(--header-height);
   border-bottom: 1px solid var(--brand-line);
-  background: rgba(5, 6, 15, 0.72);
+  background: color-mix(in srgb, var(--brand-card) 85%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   z-index: 50;
@@ -190,7 +296,160 @@ header {
   }
 }
 
-/* Glass card treatment */
+/* ============================================================
+   Theme switcher
+   ============================================================ */
+
+.theme-switcher {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--brand-radius-md);
+  border: 1px solid var(--brand-border);
+  background: color-mix(in srgb, var(--brand-surface) 60%, transparent);
+  color: var(--brand-muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-out-expo);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.theme-mode-btn:hover {
+  border-color: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit) / 0.45);
+  color: var(--brand-foreground);
+  box-shadow: var(--brand-glow);
+}
+
+.theme-mode-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s var(--ease-elastic);
+}
+
+.theme-mode-btn:hover svg {
+  transform: rotate(12deg) scale(1.08);
+}
+
+.theme-color-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--brand-radius-md);
+  border: 1px solid var(--brand-border);
+  background: color-mix(in srgb, var(--brand-surface) 60%, transparent);
+  color: var(--brand-muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-out-expo);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.theme-color-toggle:hover {
+  border-color: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit) / 0.45);
+  color: var(--brand-foreground);
+}
+
+.theme-color-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.theme-popover {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  min-width: 220px;
+  padding: 0.75rem;
+  border-radius: var(--brand-radius-lg);
+  border: 1px solid var(--brand-border);
+  background: color-mix(in srgb, var(--brand-card) 90%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-floating), var(--brand-glow);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease-out-expo), transform 0.2s var(--ease-out-expo);
+  z-index: 100;
+}
+
+.theme-popover.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.theme-popover-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brand-muted-foreground);
+  margin-bottom: 0.6rem;
+  padding: 0 0.25rem;
+}
+
+.theme-color-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+
+.theme-color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-elastic), box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+
+.theme-color-dot:hover {
+  transform: scale(1.15);
+}
+
+.theme-color-dot.active {
+  border-color: var(--brand-foreground);
+  box-shadow: 0 0 0 2px var(--brand-background), 0 0 0 4px var(--brand-primary);
+}
+
+.theme-color-dot[data-color="indigo"] { background: #7b61ff; }
+.theme-color-dot[data-color="violet"] { background: #8b5cf6; }
+.theme-color-dot[data-color="cyan"] { background: #06b6d4; }
+.theme-color-dot[data-color="rose"] { background: #f43f5e; }
+.theme-color-dot[data-color="emerald"] { background: #10b981; }
+.theme-color-dot[data-color="amber"] { background: #f59e0b; }
+
+@media (max-width: 640px) {
+  .theme-popover {
+    right: -0.5rem;
+  }
+  .theme-color-grid {
+    gap: 0.4rem;
+  }
+  .theme-color-dot {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* ============================================================
+   Glass card treatment
+   ============================================================ */
+
 .glow-hover {
   position: relative;
   transition: transform 0.25s var(--ease-out-expo), border-color 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo);
@@ -201,10 +460,18 @@ header {
   border-color: var(--brand-line);
 }
 
+html.light .glow-hover.bg-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.72));
+}
+
 .glow-hover:hover {
   transform: translateY(-3px);
-  border-color: rgba(123, 97, 255, 0.45);
+  border-color: hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit) / 0.45);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), var(--brand-glow);
+}
+
+html.light .glow-hover:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08), var(--brand-glow);
 }
 
 .glow-hover:active {
@@ -227,7 +494,7 @@ header {
 
 .bg-primary:hover {
   filter: brightness(1.12);
-  box-shadow: 0 8px 24px rgba(123, 97, 255, 0.28);
+  box-shadow: var(--brand-glow-strong);
 }
 
 .bg-primary:active {
@@ -248,7 +515,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Gradient text utility */
 .text-gradient {
-  background: linear-gradient(180deg, var(--brand-foreground) 0%, rgba(123, 97, 255, 0.85) 100%);
+  background: linear-gradient(180deg, var(--brand-foreground) 0%, hsl(var(--brand-hue) var(--brand-sat) var(--brand-lit) / 0.85) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -408,6 +675,21 @@ footer { animation-delay: 220ms; }
     </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
+    <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('devtoolkit-theme');
+        if (saved) {
+          const t = JSON.parse(saved);
+          if (t.mode === 'light') {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
+          }
+          if (t.color) document.documentElement.setAttribute('data-theme', t.color);
+        }
+      } catch (_) {}
+    })();
+    </script>
     <main class="bg-background text-foreground">
       <!-- Header -->
       <header class="sticky top-0 z-50 h-[68px] border-b border-border bg-background/95 backdrop-blur">
@@ -420,6 +702,26 @@ footer { animation-delay: 220ms; }
             <a href="/tools" class="text-sm font-medium text-primary" data-dom-id="nav-tools">Tools</a>
             <a href="/about" class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-dom-id="nav-about">About</a>
           </nav>
+          <div class="theme-switcher">
+            <button type="button" class="theme-mode-btn" aria-label="Toggle dark mode">
+              <i data-lucide="moon" class="theme-mode-icon-dark"></i>
+              <i data-lucide="sun" class="theme-mode-icon-light" style="display:none;"></i>
+            </button>
+            <button type="button" class="theme-color-toggle" aria-label="Choose theme color">
+              <i data-lucide="palette"></i>
+            </button>
+            <div class="theme-popover" role="dialog" aria-label="Theme colors">
+              <span class="theme-popover-label">Theme color</span>
+              <div class="theme-color-grid">
+                <button type="button" class="theme-color-dot" data-color="indigo" aria-label="Indigo"></button>
+                <button type="button" class="theme-color-dot" data-color="violet" aria-label="Violet"></button>
+                <button type="button" class="theme-color-dot" data-color="cyan" aria-label="Cyan"></button>
+                <button type="button" class="theme-color-dot" data-color="rose" aria-label="Rose"></button>
+                <button type="button" class="theme-color-dot" data-color="emerald" aria-label="Emerald"></button>
+                <button type="button" class="theme-color-dot" data-color="amber" aria-label="Amber"></button>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -564,6 +866,66 @@ footer { animation-delay: 220ms; }
       </footer>
     </main>
     <script>lucide.createIcons();</script>
+    <script>
+    (function() {
+      const STORAGE_KEY = 'devtoolkit-theme';
+      const root = document.documentElement;
+
+      function saveTheme(mode, color) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode, color }));
+      }
+
+      function updateModeIcons() {
+        const isLight = root.classList.contains('light');
+        document.querySelectorAll('.theme-mode-icon-dark').forEach(el => el.style.display = isLight ? 'none' : 'block');
+        document.querySelectorAll('.theme-mode-icon-light').forEach(el => el.style.display = isLight ? 'block' : 'none');
+      }
+
+      function updateColorDots() {
+        const current = root.getAttribute('data-theme') || 'indigo';
+        document.querySelectorAll('.theme-color-dot').forEach(dot => {
+          dot.classList.toggle('active', dot.dataset.color === current);
+        });
+      }
+
+      document.querySelectorAll('.theme-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isLight = root.classList.toggle('light');
+          root.classList.toggle('dark', !isLight);
+          const color = root.getAttribute('data-theme') || 'indigo';
+          saveTheme(isLight ? 'light' : 'dark', color);
+          updateModeIcons();
+        });
+      });
+
+      document.querySelectorAll('.theme-color-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const popover = btn.closest('.theme-switcher').querySelector('.theme-popover');
+          popover.classList.toggle('open');
+        });
+      });
+
+      document.querySelectorAll('.theme-color-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+          const color = dot.dataset.color;
+          root.setAttribute('data-theme', color);
+          const mode = root.classList.contains('light') ? 'light' : 'dark';
+          saveTheme(mode, color);
+          updateColorDots();
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.theme-switcher')) {
+          document.querySelectorAll('.theme-popover').forEach(p => p.classList.remove('open'));
+        }
+      });
+
+      updateModeIcons();
+      updateColorDots();
+    })();
+    </script>
 
     <style id="critical-layout">
       header { position: sticky; top: 0; height: 68px; }

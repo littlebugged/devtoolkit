@@ -8,7 +8,7 @@ const { id, class: className = '' } = Astro.props;
 ---
 
 <div class={`ad-container ${className}`} id={id}>
-  <script is:inline data-cfasync="false">
+  <script is:inline data-cfasync="false" type="text/javascript">
     atOptions = {
       'key' : 'ce88094cd4550c185792b9388fca6963',
       'format' : 'iframe',
@@ -17,5 +17,5 @@ const { id, class: className = '' } = Astro.props;
       'params' : {}
     };
   </script>
-  <script is:inline data-cfasync="false" src="https://www.highperformanceformat.com/ce88094cd4550c185792b9388fca6963/invoke.js"></script>
+  <script is:inline data-cfasync="false" type="text/javascript" src="https://www.highperformanceformat.com/ce88094cd4550c185792b9388fca6963/invoke.js"></script>
 </div>
