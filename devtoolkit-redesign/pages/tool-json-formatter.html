@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter - DevToolKit</title>
+    <style id="theme-vars">
+/* DevToolKit — premium dark glassmorphism design system for overseas developer tools */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Primitive palette — one brand hue, no secondary/accent */
+  --brand-background: #05060f;
+  --brand-foreground: #f7f8fc;
+
+  --brand-card: #0d111c;
+  --brand-card-foreground: #f7f8fc;
+
+  --brand-popover: #0d111c;
+  --brand-popover-foreground: #f7f8fc;
+
+  --brand-primary: #7b61ff;
+  --brand-primary-foreground: #ffffff;
+
+  --brand-muted: #131725;
+  --brand-muted-foreground: #8b92a8;
+
+  --brand-border: rgba(255, 255, 255, 0.09);
+  --brand-input: #151928;
+  --brand-ring: #7b61ff;
+
+  /* Extended surface tokens */
+  --brand-surface: #0d111c;
+  --brand-surface-2: #151b2b;
+  --brand-line: rgba(255, 255, 255, 0.09);
+  --brand-glow: 0 0 28px rgba(123, 97, 255, 0.18);
+
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-radius-xl: 16px;
+
+  /* State colors */
+  --state-success: #22c55e;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #3b82f6;
+
+  /* Typography */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* Depth — static shadows stay subtle (<=0.05); deep shadows reserved for floating layers */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.05);
+  --shadow-floating: 0 24px 60px -16px rgba(0, 0, 0, 0.45);
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* Layout */
+  --max-width: 1200px;
+  --header-height: 68px;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Base typography resets */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--brand-background);
+  color: var(--brand-foreground);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Soft ambient gradient behind content */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(123, 97, 255, 0.12), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%, rgba(59, 130, 246, 0.06), transparent 55%);
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(123, 97, 255, 0.35);
+  color: #ffffff;
+}
+
+/* Focus visibility */
+:focus-visible {
+  outline: 2px solid var(--brand-ring);
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Layout scaffolding */
+header {
+  position: sticky;
+  top: 0;
+  height: var(--header-height);
+  border-bottom: 1px solid var(--brand-line);
+  background: rgba(5, 6, 15, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 50;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.header-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+.hero-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+  text-align: center;
+}
+
+.tool-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+.tool-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+@media (max-width: 640px) {
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-section {
+    padding: 3.5rem 1rem;
+  }
+  .tool-section {
+    padding: 0 1rem 3.5rem;
+  }
+  .header-inner {
+    padding: 0 1rem;
+  }
+}
+
+/* Glass card treatment */
+.glow-hover {
+  position: relative;
+  transition: transform 0.25s var(--ease-out-expo), border-color 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo);
+}
+
+.glow-hover.bg-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border-color: var(--brand-line);
+}
+
+.glow-hover:hover {
+  transform: translateY(-3px);
+  border-color: rgba(123, 97, 255, 0.45);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), var(--brand-glow);
+}
+
+.glow-hover:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+.glow-hover i[data-lucide] {
+  transition: transform 0.25s var(--ease-elastic), color 0.25s ease;
+}
+
+.glow-hover:hover i[data-lucide] {
+  transform: scale(1.08);
+  color: var(--brand-primary);
+}
+
+/* Primary CTA refinement */
+.bg-primary {
+  transition: filter 0.2s ease, transform 0.2s var(--ease-out-expo), box-shadow 0.2s ease;
+}
+
+.bg-primary:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 8px 24px rgba(123, 97, 255, 0.28);
+}
+
+.bg-primary:active {
+  transform: scale(0.98);
+}
+
+/* Nav links */
+header a,
+footer a {
+  transition: color 0.15s ease;
+}
+
+/* Typography polish */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(180deg, var(--brand-foreground) 0%, rgba(123, 97, 255, 0.85) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Entrance animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+header,
+section,
+footer {
+  animation: fadeInUp 0.6s var(--ease-out-expo) both;
+}
+
+header { animation-delay: 0ms; }
+section:nth-of-type(1) { animation-delay: 60ms; }
+section:nth-of-type(2) { animation-delay: 120ms; }
+section:nth-of-type(3) { animation-delay: 180ms; }
+footer { animation-delay: 220ms; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility helpers */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  background-color: currentColor;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+    --radius-xl: var(--brand-radius-xl);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <header class="page-header border-b border-border">
+        <div class="header-inner">
+            <a href="index.html" data-dom-id="nav-home" class="flex items-center gap-2 text-foreground font-semibold text-lg hover:text-primary transition-colors">
+                <i data-lucide="zap" class="w-5 h-5 text-primary"></i>
+                <span>DevToolKit</span>
+            </a>
+            <nav class="flex items-center gap-6">
+                <a href="tools.html" data-dom-id="nav-tools" class="text-sm text-muted-foreground hover:text-foreground transition-colors">Tools</a>
+                <a href="about.html" data-dom-id="nav-about" class="text-sm text-muted-foreground hover:text-foreground transition-colors">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-main">
+        <nav aria-label="Breadcrumb" class="mb-8">
+            <ol class="flex items-center gap-2 text-sm text-muted-foreground">
+                <li><a href="index.html" class="hover:text-foreground transition-colors">Home</a></li>
+                <li><i data-lucide="chevron-right" class="w-4 h-4"></i></li>
+                <li class="text-foreground">JSON Formatter</li>
+            </ol>
+        </nav>
+
+        <section class="mb-10">
+            <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-3">JSON Formatter</h1>
+            <p class="text-base text-muted-foreground max-w-2xl">Format and validate JSON with instant, client-side preview. No data leaves your device.</p>
+        </section>
+
+        <section class="bg-card border border-border rounded-2xl p-5 md:p-6 mb-16 shadow-sm">
+            <div class="control-bar mb-5">
+                <button type="button" data-dom-id="btn-format" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-ring transition-all">
+                    <i data-lucide="align-left" class="w-4 h-4"></i>
+                    Format
+                </button>
+                <button type="button" data-dom-id="btn-minify" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-foreground border border-border text-sm font-medium hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring transition-all">
+                    <i data-lucide="minus" class="w-4 h-4"></i>
+                    Minify
+                </button>
+                <button type="button" data-dom-id="btn-copy" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-foreground border border-border text-sm font-medium hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring transition-all">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                    Copy
+                </button>
+                <button type="button" data-dom-id="btn-clear" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-foreground border border-border text-sm font-medium hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring transition-all">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    Clear
+                </button>
+            </div>
+
+            <div class="io-grid">
+                <div class="flex flex-col gap-2">
+                    <label for="json-input" class="text-sm font-medium text-foreground">Input</label>
+                    <textarea id="json-input" class="w-full min-h-[320px] rounded-xl bg-input border border-border p-4 font-mono text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-y" placeholder='{"status":"ok","data":{"id":1,"name":"DevToolKit","features":["fast","private","offline"],"active":true}}' spellcheck="false"></textarea>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label for="json-output" class="text-sm font-medium text-foreground">Formatted JSON</label>
+                    <div id="json-output" class="w-full min-h-[320px] rounded-xl bg-input border border-border p-4 font-mono text-sm text-foreground overflow-auto" aria-readonly="true" role="region" aria-label="Formatted JSON output">
+                        <span class="text-muted-foreground">Formatted output will appear here.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-semibold text-foreground mb-5">Related tools</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <a href="tool-base64.html" class="group flex items-start gap-4 bg-card border border-border rounded-xl p-5 hover:border-primary/60 hover:shadow-glow transition-all">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
+                        <i data-lucide="replace" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-medium text-foreground group-hover:text-primary transition-colors">Base64 Encoder/Decoder</h3>
+                        <p class="text-sm text-muted-foreground mt-1">Encode and decode Base64 strings instantly.</p>
+                    </div>
+                </a>
+                <a href="tool-url-encoder.html" class="group flex items-start gap-4 bg-card border border-border rounded-xl p-5 hover:border-primary/60 hover:shadow-glow transition-all">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
+                        <i data-lucide="link" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-medium text-foreground group-hover:text-primary transition-colors">URL Encoder/Decoder</h3>
+                        <p class="text-sm text-muted-foreground mt-1">Escape and unescape URL parameters safely.</p>
+                    </div>
+                </a>
+                <a href="tool-markdown-preview.html" class="group flex items-start gap-4 bg-card border border-border rounded-xl p-5 hover:border-primary/60 hover:shadow-glow transition-all">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-medium text-foreground group-hover:text-primary transition-colors">Markdown Preview</h3>
+                        <p class="text-sm text-muted-foreground mt-1">Preview rendered Markdown in real time.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-border bg-card">
+        <div class="max-w-[1200px] mx-auto px-4 py-8 text-center">
+            <p class="text-sm text-muted-foreground mb-3">All tools run in your browser — no data is sent to any server.</p>
+            <div class="flex items-center justify-center gap-5 text-sm">
+                <a href="tools.html" class="text-muted-foreground hover:text-foreground transition-colors">All Tools</a>
+                <a href="about.html" class="text-muted-foreground hover:text-foreground transition-colors">About</a>
+            </div>
+        </div>
+    </footer>
+    <script>lucide.createIcons();</script>
+
+    <style id="critical-layout">
+      .page-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        height: 68px;
+        border-bottom: 1px solid var(--brand-border);
+        background-color: rgba(8, 10, 15, 0.85);
+        backdrop-filter: blur(12px);
+      }
+      .header-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1rem;
+      }
+      .page-main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem 5rem;
+      }
+      .io-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      @media (min-width: 1024px) {
+        .io-grid { grid-template-columns: 1fr 1fr; }
+      }
+      .control-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+    </style>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{
+  "data": [
+    {
+      "id": "page-index",
+      "title": "Home",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1785472000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1532,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6604f483",
+          "measuredAt": 1785472717780
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index.html",
+        "interactions": [
+          {
+            "domId": "nav-home",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "Go home"
+          },
+          {
+            "domId": "nav-tools",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "Browse tools"
+          },
+          {
+            "domId": "cta-hero",
+            "targetPageId": "page-tool-json-formatter",
+            "hideEdge": true,
+            "transitionLabel": "Open JSON Formatter"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-tool-json-formatter",
+      "title": "JSON Formatter",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1785472000000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1143,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-7305d926",
+          "measuredAt": 1785472717780
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/tool-json-formatter.html",
+        "interactions": [
+          {
+            "domId": "nav-home",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "Go home"
+          },
+          {
+            "domId": "nav-tools",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "Browse tools"
+          }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "DevToolKit Redesign",
+    "designLibrary": null
+  }
+}

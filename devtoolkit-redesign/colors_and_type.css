@@ -1,0 +1,301 @@
+/* DevToolKit — premium dark glassmorphism design system for overseas developer tools */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Primitive palette — one brand hue, no secondary/accent */
+  --brand-background: #05060f;
+  --brand-foreground: #f7f8fc;
+
+  --brand-card: #0d111c;
+  --brand-card-foreground: #f7f8fc;
+
+  --brand-popover: #0d111c;
+  --brand-popover-foreground: #f7f8fc;
+
+  --brand-primary: #7b61ff;
+  --brand-primary-foreground: #ffffff;
+
+  --brand-muted: #131725;
+  --brand-muted-foreground: #8b92a8;
+
+  --brand-border: rgba(255, 255, 255, 0.09);
+  --brand-input: #151928;
+  --brand-ring: #7b61ff;
+
+  /* Extended surface tokens */
+  --brand-surface: #0d111c;
+  --brand-surface-2: #151b2b;
+  --brand-line: rgba(255, 255, 255, 0.09);
+  --brand-glow: 0 0 28px rgba(123, 97, 255, 0.18);
+
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-radius-xl: 16px;
+
+  /* State colors */
+  --state-success: #22c55e;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #3b82f6;
+
+  /* Typography */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* Depth — static shadows stay subtle (<=0.05); deep shadows reserved for floating layers */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.05);
+  --shadow-floating: 0 24px 60px -16px rgba(0, 0, 0, 0.45);
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* Layout */
+  --max-width: 1200px;
+  --header-height: 68px;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Base typography resets */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--brand-background);
+  color: var(--brand-foreground);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Soft ambient gradient behind content */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(123, 97, 255, 0.12), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%, rgba(59, 130, 246, 0.06), transparent 55%);
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(123, 97, 255, 0.35);
+  color: #ffffff;
+}
+
+/* Focus visibility */
+:focus-visible {
+  outline: 2px solid var(--brand-ring);
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Layout scaffolding */
+header {
+  position: sticky;
+  top: 0;
+  height: var(--header-height);
+  border-bottom: 1px solid var(--brand-line);
+  background: rgba(5, 6, 15, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 50;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.header-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+.hero-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+  text-align: center;
+}
+
+.tool-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+.tool-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+@media (max-width: 640px) {
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-section {
+    padding: 3.5rem 1rem;
+  }
+  .tool-section {
+    padding: 0 1rem 3.5rem;
+  }
+  .header-inner {
+    padding: 0 1rem;
+  }
+}
+
+/* Glass card treatment */
+.glow-hover {
+  position: relative;
+  transition: transform 0.25s var(--ease-out-expo), border-color 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo);
+}
+
+.glow-hover.bg-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border-color: var(--brand-line);
+}
+
+.glow-hover:hover {
+  transform: translateY(-3px);
+  border-color: rgba(123, 97, 255, 0.45);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), var(--brand-glow);
+}
+
+.glow-hover:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+.glow-hover i[data-lucide] {
+  transition: transform 0.25s var(--ease-elastic), color 0.25s ease;
+}
+
+.glow-hover:hover i[data-lucide] {
+  transform: scale(1.08);
+  color: var(--brand-primary);
+}
+
+/* Primary CTA refinement */
+.bg-primary {
+  transition: filter 0.2s ease, transform 0.2s var(--ease-out-expo), box-shadow 0.2s ease;
+}
+
+.bg-primary:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 8px 24px rgba(123, 97, 255, 0.28);
+}
+
+.bg-primary:active {
+  transform: scale(0.98);
+}
+
+/* Nav links */
+header a,
+footer a {
+  transition: color 0.15s ease;
+}
+
+/* Typography polish */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(180deg, var(--brand-foreground) 0%, rgba(123, 97, 255, 0.85) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Entrance animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+header,
+section,
+footer {
+  animation: fadeInUp 0.6s var(--ease-out-expo) both;
+}
+
+header { animation-delay: 0ms; }
+section:nth-of-type(1) { animation-delay: 60ms; }
+section:nth-of-type(2) { animation-delay: 120ms; }
+section:nth-of-type(3) { animation-delay: 180ms; }
+footer { animation-delay: 220ms; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility helpers */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  background-color: currentColor;
+}
