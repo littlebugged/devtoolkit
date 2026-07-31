@@ -67,7 +67,8 @@ const tool = getToolBySlug('json-formatter')!;
       background: var(--color-primary);
       color: #fff;
     }
-
+  </style>
+  <style is:global>
     .json-tree {
       background: var(--color-input-bg);
       border: 1px solid var(--color-border);
@@ -80,8 +81,7 @@ const tool = getToolBySlug('json-formatter')!;
       overflow-y: auto;
       min-height: 200px;
     }
-
-    .jt-row { display: flex; }
+    .jt-row { display: flex; align-items: baseline; }
     .jt-toggle {
       cursor: pointer;
       user-select: none;
@@ -90,8 +90,11 @@ const tool = getToolBySlug('json-formatter')!;
       text-align: center;
       color: var(--color-text-muted);
       flex-shrink: 0;
+      transition: transform 0.15s ease;
     }
     .jt-toggle:hover { color: var(--color-primary); }
+    .jt-node { }
+    .jt-node.jt-collapsed > .jt-row > .jt-toggle { transform: rotate(-90deg); }
     .jt-key { color: #93c5fd; }
     .jt-idx { color: #a78bfa; font-size: 0.75rem; opacity: 0.7; }
     .jt-str { color: #86efac; }
@@ -102,9 +105,12 @@ const tool = getToolBySlug('json-formatter')!;
     .jt-comma { color: var(--color-text-muted); }
     .jt-type { color: var(--color-text-muted); font-size: 0.7rem; margin-left: 6px; opacity: 0.6; }
     .jt-children { padding-left: 20px; }
-    .jt-collapsed .jt-children { display: none; }
-    .jt-collapsed .jt-ellipsis { display: inline; }
+    .jt-node.jt-collapsed > .jt-children { display: none; }
+    .jt-node.jt-collapsed > .jt-row .jt-ellipsis { display: inline; }
+    .jt-node.jt-collapsed > .jt-row .jt-type { display: none; }
     .jt-ellipsis { display: none; color: var(--color-text-muted); }
+    .jt-closing { margin-left: 16px; }
+    .jt-node.jt-collapsed > .jt-closing { display: none; }
   </style>
 
   <script is:inline>
@@ -149,15 +155,16 @@ const tool = getToolBySlug('json-formatter')!;
 
       function buildTree(data, key, isLast, isArrayItem, arrayIndex) {
         var type = data === null ? 'null' : Array.isArray(data) ? 'array' : typeof data;
-        var html = '<div class="jt-row">';
 
         if (type === 'object' || type === 'array') {
-          var entries = type === 'array' ? data : Object.entries(data);
           var count = type === 'array' ? data.length : Object.keys(data).length;
           var openBracket = type === 'array' ? '[' : '{';
           var closeBracket = type === 'array' ? ']' : '}';
+          var label = count + ' ' + (type === 'array' ? 'items' : 'keys');
 
-          html += '<span class="jt-toggle" onclick="this.parentElement.parentElement.classList.toggle(\'jt-collapsed\')">\u25BE</span>';
+          var html = '<div class="jt-node">';
+          html += '<div class="jt-row">';
+          html += '<span class="jt-toggle">\u25BE</span>';
 
           if (key !== undefined) {
             if (isArrayItem) {
@@ -168,26 +175,28 @@ const tool = getToolBySlug('json-formatter')!;
           }
 
           html += '<span class="jt-bracket">' + openBracket + '</span>';
-          html += '<span class="jt-ellipsis"> ... </span>';
-          html += '<span class="jt-type">' + count + ' ' + (type === 'array' ? 'items' : 'keys') + '</span>';
+          html += '<span class="jt-ellipsis"> \u2026 ' + label + ' </span>';
+          html += '<span class="jt-type">' + label + '</span>';
           html += '</div>';
 
           html += '<div class="jt-children">';
           if (type === 'array') {
             data.forEach(function (item, i) {
-              html += '<div>' + buildTree(item, undefined, i === data.length - 1, true, i) + '</div>';
+              html += buildTree(item, undefined, i === data.length - 1, true, i);
             });
           } else {
             var keys = Object.keys(data);
             keys.forEach(function (k, i) {
-              html += '<div>' + buildTree(data[k], k, i === keys.length - 1, false) + '</div>';
+              html += buildTree(data[k], k, i === keys.length - 1, false);
             });
           }
           html += '</div>';
-          html += '<div class="jt-row"><span style="width:16px;display:inline-block;"></span><span class="jt-bracket">' + closeBracket + '</span>' + (isLast ? '' : '<span class="jt-comma">,</span>') + '</div>';
+          html += '<div class="jt-closing"><span class="jt-bracket">' + closeBracket + '</span>' + (isLast ? '' : '<span class="jt-comma">,</span>') + '</div>';
+          html += '</div>';
           return html;
         }
 
+        var html = '<div class="jt-row">';
         html += '<span style="width:16px;display:inline-block;"></span>';
         if (key !== undefined) {
           if (isArrayItem) {
@@ -262,6 +271,13 @@ const tool = getToolBySlug('json-formatter')!;
         output.style.display = treeMode ? 'none' : '';
         treeEl.style.display = treeMode ? '' : 'none';
         if (treeMode) renderTree();
+      });
+
+      treeEl.addEventListener('click', function (e) {
+        var toggle = e.target.closest('.jt-toggle');
+        if (!toggle) return;
+        var node = toggle.closest('.jt-node');
+        if (node) node.classList.toggle('jt-collapsed');
       });
     })();
   </script>
