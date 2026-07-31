@@ -16,11 +16,12 @@
     },
     "selectedIntentWorkflowRead": true,
     "themeCustomizationEvidence": {
-      "changedTokenDimensions": ["background", "foreground", "card", "primary", "border", "muted", "shadow", "radius", "motion"],
+      "changedTokenDimensions": ["background", "foreground", "card", "primary", "border", "muted", "shadow", "radius", "motion", "light-mode", "theme-color-presets", "theme-switcher-ui"],
       "affectedPageHeadRefreshList": ["pages/index.html", "pages/tool-json-formatter.html"],
       "noNewPageAssertion": true,
-      "headRefreshCommand": "node '/Users/zhoudongxu/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs' '/Users/zhoudongxu/devtoolkit/devtoolkit-redesign/colors_and_type.css' '/Users/zhoudongxu/devtoolkit/devtoolkit-redesign/pages/index.html' '/Users/zhoudongxu/devtoolkit/devtoolkit-redesign/pages/tool-json-formatter.html' --replace-head --theme=dark",
-      "cssFilePath": "colors_and_type.css"
+      "headRefreshCommand": "node '/Users/zhoudongxu/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs' '/Users/zhoudongxu/devtoolkit/devtoolkit-redesign/colors_and_type.css' '/Users/zhoudongxu/devtoolkit/devtoolkit-redesign/pages/index.html' '/Users/zhoudongxu/devtoolkit/devtoolkit-redesign/pages/tool-json-formatter.html' --replace-head",
+      "cssFilePath": "colors_and_type.css",
+      "themeFeatures": ["day-night-toggle", "six-color-presets", "localStorage-persistence", "anti-flicker-init"]
     },
     "contextRequirementsLoaded": [
       {
