@@ -1,0 +1,123 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+const tool = getToolBySlug('jwt-decoder')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <button id="btn-decode" class="btn btn-primary">Decode</button>
+    <button id="btn-clear" class="btn">Clear</button>
+  </div>
+
+  <div class="tool-panel" style="margin-bottom:16px;">
+    <label for="jwt-input">JWT Token</label>
+    <textarea id="jwt-input" rows="4" placeholder="Paste your JWT token here…">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.POstGetfAytaZS82wHcjoTyoqhMyxXiWdR7Nn7A29DNSl0EiXLdwJ6xC6AfgZWF1bOsS_TuYI3OG85AmiExREkrS6tDfTQ2B3WXlrr-wp5AokiRbz3_oB4OxG-W9KcEEbDRcZc0nH3L7LzYptiy1PtAylQGxHTWZXtGz4ht0bAecBgmpdgXMguEIcoqPJ1n3pIWk_dUZegpqx0Lka21H6XxUTxiy8OcaarA8zdnPUnV6AmNP3ecFawIFYdvJB_cm10guX0HjHA0WRb7bHqQ7DshEcNDRNQaNbhrSpBmaQ0WRb7b</textarea>
+  </div>
+
+  <div id="jwt-status" class="jwt-status"></div>
+
+  <div class="jwt-sections">
+    <div class="jwt-section">
+      <h3 class="jwt-section-title jwt-header-label">Header</h3>
+      <pre id="jwt-header" class="jwt-code"></pre>
+    </div>
+    <div class="jwt-section">
+      <h3 class="jwt-section-title jwt-payload-label">Payload</h3>
+      <pre id="jwt-payload" class="jwt-code"></pre>
+    </div>
+    <div class="jwt-section">
+      <h3 class="jwt-section-title jwt-sig-label">Signature</h3>
+      <div id="jwt-signature" class="jwt-code jwt-sig-text"></div>
+    </div>
+  </div>
+
+  <div slot="info">
+    <h2>How to Use</h2>
+    <p>Paste a JSON Web Token into the input field and click <strong>Decode</strong>. The tool splits the token into its three parts — Header, Payload, and Signature — and displays the decoded JSON. Expiration times are automatically converted to readable dates.</p>
+    <h3>What is a JWT?</h3>
+    <p>A JSON Web Token (JWT) is a compact, URL-safe token format used for authentication and information exchange. It consists of three Base64URL-encoded parts separated by dots: <code>header.payload.signature</code>. The header specifies the signing algorithm, the payload contains claims (user data, expiration, etc.), and the signature verifies integrity.</p>
+    <h3>Security Note</h3>
+    <p>This tool only <em>decodes</em> the token — it does not verify the signature. Never share JWTs containing sensitive data. All decoding happens locally in your browser.</p>
+  </div>
+
+  <script is:inline>
+    function base64UrlDecode(str) {
+      str = str.replace(/-/g, '+').replace(/_/g, '/');
+      while (str.length % 4) str += '=';
+      return atob(str);
+    }
+
+    function decodeJwt(token) {
+      const parts = token.trim().split('.');
+      if (parts.length !== 3) throw new Error('Invalid JWT: must have 3 parts separated by dots');
+      const header = JSON.parse(base64UrlDecode(parts[0]));
+      const payload = JSON.parse(base64UrlDecode(parts[1]));
+      return { header, payload, signature: parts[2] };
+    }
+
+    function formatPayload(payload) {
+      const formatted = { ...payload };
+      const timeFields = ['iat', 'exp', 'nbf', 'auth_time'];
+      timeFields.forEach(f => {
+        if (formatted[f] && typeof formatted[f] === 'number') {
+          const d = new Date(formatted[f] * 1000);
+          formatted[f + ' (decoded)'] = d.toISOString();
+        }
+      });
+      return formatted;
+    }
+
+    const inputEl = document.getElementById('jwt-input');
+    const statusEl = document.getElementById('jwt-status');
+    const headerEl = document.getElementById('jwt-header');
+    const payloadEl = document.getElementById('jwt-payload');
+    const sigEl = document.getElementById('jwt-signature');
+
+    function decode() {
+      try {
+        const { header, payload, signature } = decodeJwt(inputEl.value);
+        headerEl.textContent = JSON.stringify(header, null, 2);
+        payloadEl.textContent = JSON.stringify(formatPayload(payload), null, 2);
+        sigEl.textContent = signature;
+
+        if (payload.exp) {
+          const exp = new Date(payload.exp * 1000);
+          const now = new Date();
+          statusEl.textContent = exp < now
+            ? '⚠ Token expired on ' + exp.toLocaleString()
+            : '✓ Token valid until ' + exp.toLocaleString();
+          statusEl.style.color = exp < now ? 'var(--danger)' : 'var(--success)';
+        } else {
+          statusEl.textContent = '✓ Decoded successfully (no expiration claim)';
+          statusEl.style.color = 'var(--success)';
+        }
+      } catch (e) {
+        statusEl.textContent = '✗ ' + e.message;
+        statusEl.style.color = 'var(--danger)';
+        headerEl.textContent = '';
+        payloadEl.textContent = '';
+        sigEl.textContent = '';
+      }
+    }
+
+    document.getElementById('btn-decode').addEventListener('click', decode);
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      inputEl.value = ''; headerEl.textContent = ''; payloadEl.textContent = '';
+      sigEl.textContent = ''; statusEl.textContent = '';
+    });
+    decode();
+  </script>
+
+  <style>
+    .jwt-status { font-size: 0.9rem; margin-bottom: 16px; min-height: 1.5em; }
+    .jwt-sections { display: grid; gap: 16px; }
+    .jwt-section { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .jwt-section-title { margin: 0; padding: 8px 16px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .jwt-header-label { background: rgba(124, 111, 245, 0.15); color: var(--accent); }
+    .jwt-payload-label { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+    .jwt-sig-label { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+    .jwt-code { margin: 0; padding: 12px 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; white-space: pre-wrap; word-break: break-all; color: var(--text); min-height: 40px; }
+    .jwt-sig-text { color: var(--text-muted); }
+  </style>
+</ToolLayout>

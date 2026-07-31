@@ -1,0 +1,158 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+const tool = getToolBySlug('regex-tester')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <div class="regex-input-row">
+      <label for="regex-pattern">Pattern</label>
+      <div class="regex-pattern-wrap">
+        <span class="regex-delimiter">/</span>
+        <input type="text" id="regex-pattern" placeholder="[A-Za-z0-9]+" />
+        <span class="regex-delimiter">/</span>
+        <input type="text" id="regex-flags" value="g" class="regex-flags" placeholder="flags" />
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-panels">
+    <div class="tool-panel">
+      <label for="regex-input">Test String</label>
+      <textarea id="regex-input" placeholder="Enter text to test against the regex...">The quick brown fox jumps over 42 lazy dogs in 2026.</textarea>
+    </div>
+    <div class="tool-panel">
+      <div class="regex-results" id="regex-results">
+        <div class="regex-match-info" id="regex-match-info"></div>
+        <div class="regex-highlighted" id="regex-highlighted"></div>
+        <div class="regex-groups" id="regex-groups"></div>
+      </div>
+    </div>
+  </div>
+
+  <div slot="info">
+    <h2>How to Use</h2>
+    <p>Enter a regular expression pattern in the top field and set flags (g for global, i for case-insensitive, m for multiline). Type or paste your test string below. Matches are highlighted in real time, and capture groups are listed separately.</p>
+    <h3>Regex Flags</h3>
+    <p><strong>g</strong> (global) — find all matches. <strong>i</strong> — case-insensitive. <strong>m</strong> — multiline (^ and $ match line boundaries). <strong>s</strong> — dotAll (. matches newline). <strong>u</strong> — unicode. Combine flags as needed, e.g. <code>gi</code>.</p>
+    <h3>Common Patterns</h3>
+    <p>Email: <code>{'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'}</code>. URL: <code>{'https?://[^\\s]+'}</code>. Numbers: <code>\d+</code>. This tool uses the JavaScript regex engine running in your browser.</p>
+  </div>
+
+  <script is:inline>
+    const patternEl = document.getElementById('regex-pattern');
+    const flagsEl = document.getElementById('regex-flags');
+    const inputEl = document.getElementById('regex-input');
+    const infoEl = document.getElementById('regex-match-info');
+    const highlightEl = document.getElementById('regex-highlighted');
+    const groupsEl = document.getElementById('regex-groups');
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function runRegex() {
+      const pattern = patternEl.value;
+      const flags = flagsEl.value;
+      const text = inputEl.value;
+
+      if (!pattern) {
+        infoEl.textContent = 'Enter a pattern above';
+        highlightEl.innerHTML = escapeHtml(text);
+        groupsEl.innerHTML = '';
+        return;
+      }
+
+      let re;
+      try {
+        re = new RegExp(pattern, flags);
+      } catch (e) {
+        infoEl.textContent = 'Error: ' + e.message;
+        infoEl.style.color = 'var(--danger)';
+        highlightEl.innerHTML = escapeHtml(text);
+        groupsEl.innerHTML = '';
+        return;
+      }
+      infoEl.style.color = '';
+
+      if (!flags.includes('g')) {
+        const m = text.match(re);
+        if (!m) {
+          infoEl.textContent = 'No match';
+          highlightEl.innerHTML = escapeHtml(text);
+          groupsEl.innerHTML = '';
+          return;
+        }
+        infoEl.textContent = '1 match found';
+        const idx = m.index;
+        const before = escapeHtml(text.slice(0, idx));
+        const match = '<mark>' + escapeHtml(m[0]) + '</mark>';
+        const after = escapeHtml(text.slice(idx + m[0].length));
+        highlightEl.innerHTML = before + match + after;
+        if (m.length > 1) {
+          groupsEl.innerHTML = '<strong>Groups:</strong> ' + m.slice(1).map((g, i) => `<span class="regex-group">Group ${i+1}: ${escapeHtml(g || '')}</span>`).join(' ');
+        } else {
+          groupsEl.innerHTML = '';
+        }
+        return;
+      }
+
+      let matches = [];
+      let match;
+      const reClone = new RegExp(pattern, flags);
+      while ((match = reClone.exec(text)) !== null) {
+        matches.push({ index: match.index, length: match[0].length, value: match[0], groups: match.slice(1) });
+        if (match[0].length === 0) reClone.lastIndex++;
+      }
+
+      if (matches.length === 0) {
+        infoEl.textContent = 'No matches';
+        highlightEl.innerHTML = escapeHtml(text);
+        groupsEl.innerHTML = '';
+        return;
+      }
+
+      infoEl.textContent = matches.length + ' match' + (matches.length > 1 ? 'es' : '') + ' found';
+      let html = '';
+      let lastEnd = 0;
+      matches.forEach(m => {
+        html += escapeHtml(text.slice(lastEnd, m.index));
+        html += '<mark>' + escapeHtml(m.value) + '</mark>';
+        lastEnd = m.index + m.length;
+      });
+      html += escapeHtml(text.slice(lastEnd));
+      highlightEl.innerHTML = html;
+
+      const withGroups = matches.filter(m => m.groups.length > 0);
+      if (withGroups.length > 0) {
+        groupsEl.innerHTML = '<strong>Groups:</strong><br>' + withGroups.map((m, i) =>
+          `Match ${i+1}: ` + m.groups.map((g, gi) => `<span class="regex-group">Group ${gi+1}: ${escapeHtml(g || '')}</span>`).join(' ')
+        ).join('<br>');
+      } else {
+        groupsEl.innerHTML = '';
+      }
+    }
+
+    patternEl.addEventListener('input', runRegex);
+    flagsEl.addEventListener('input', runRegex);
+    inputEl.addEventListener('input', runRegex);
+    runRegex();
+  </script>
+
+  <style>
+    .regex-input-row { margin-bottom: 12px; }
+    .regex-input-row label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px; }
+    .regex-pattern-wrap { display: flex; align-items: center; gap: 4px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; }
+    .regex-pattern-wrap input { background: none; border: none; color: var(--text); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 1rem; outline: none; }
+    .regex-pattern-wrap input#regex-pattern { flex: 1; }
+    .regex-flags { width: 50px; text-align: center; }
+    .regex-delimiter { color: var(--accent); font-family: monospace; font-size: 1.2rem; }
+    .regex-results { padding: 12px; }
+    .regex-match-info { font-size: 0.9rem; color: var(--accent); margin-bottom: 8px; }
+    .regex-highlighted { font-family: monospace; font-size: 0.95rem; line-height: 1.8; white-space: pre-wrap; word-break: break-all; }
+    .regex-highlighted mark { background: var(--accent); color: #fff; border-radius: 3px; padding: 1px 3px; }
+    .regex-groups { margin-top: 12px; font-size: 0.85rem; }
+    .regex-group { background: var(--bg-card); padding: 2px 8px; border-radius: 4px; margin: 0 4px; display: inline-block; }
+  </style>
+</ToolLayout>

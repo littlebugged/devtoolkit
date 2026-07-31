@@ -1,0 +1,93 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+const tool = getToolBySlug('json-to-csv')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <button id="btn-convert" class="btn btn-primary">Convert</button>
+    <button id="btn-copy" class="btn">Copy CSV</button>
+    <button id="btn-download" class="btn">Download</button>
+    <button id="btn-clear" class="btn">Clear</button>
+  </div>
+
+  <div class="tool-panels">
+    <div class="tool-panel">
+      <label for="json-input">JSON Input</label>
+      <textarea id="json-input" placeholder="Paste a JSON array here…">{`[{"name":"Alice","email":"alice@example.com","age":30,"city":"New York"},{"name":"Bob","email":"bob@example.com","age":25,"city":"London"},{"name":"Charlie","email":"charlie@example.com","age":35,"city":"Tokyo"}]`}</textarea>
+    </div>
+    <div class="tool-panel">
+      <label for="csv-output">CSV Output</label>
+      <textarea id="csv-output" placeholder="CSV will appear here…" readonly></textarea>
+    </div>
+  </div>
+
+  <div id="convert-status" class="convert-status"></div>
+
+  <div slot="info">
+    <h2>How to Use</h2>
+    <p>Paste a JSON array of objects into the left panel and click <strong>Convert</strong>. The tool extracts all unique keys as CSV headers and converts each object into a row. Click <strong>Download</strong> to save as a .csv file.</p>
+    <h3>Supported Formats</h3>
+    <p>Input must be a JSON array of objects. Nested objects are stringified. Values containing commas or quotes are properly escaped per RFC 4180. This tool runs entirely in your browser.</p>
+  </div>
+
+  <script is:inline>
+    function jsonToCsv(jsonStr) {
+      const data = JSON.parse(jsonStr);
+      if (!Array.isArray(data) || data.length === 0) throw new Error('Input must be a non-empty JSON array');
+      const headers = [...new Set(data.flatMap(obj => Object.keys(obj)))];
+      const escapeCsv = (val) => {
+        if (val === null || val === undefined) return '';
+        const str = typeof val === 'object' ? JSON.stringify(val) : String(val);
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+          return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+      };
+      const rows = data.map(obj => headers.map(h => escapeCsv(obj[h])).join(','));
+      return [headers.join(','), ...rows].join('\n');
+    }
+
+    const inputEl = document.getElementById('json-input');
+    const outputEl = document.getElementById('csv-output');
+    const statusEl = document.getElementById('convert-status');
+
+    document.getElementById('btn-convert').addEventListener('click', () => {
+      try {
+        const csv = jsonToCsv(inputEl.value);
+        outputEl.value = csv;
+        const lines = csv.split('\n');
+        statusEl.textContent = `✓ Converted: ${lines.length - 1} rows, ${lines[0].split(',').length} columns`;
+        statusEl.style.color = 'var(--success)';
+      } catch (e) {
+        statusEl.textContent = '✗ ' + e.message;
+        statusEl.style.color = 'var(--danger)';
+        outputEl.value = '';
+      }
+    });
+
+    document.getElementById('btn-copy').addEventListener('click', () => {
+      if (outputEl.value) {
+        navigator.clipboard.writeText(outputEl.value).then(() => showToast('CSV copied!'));
+      }
+    });
+
+    document.getElementById('btn-download').addEventListener('click', () => {
+      if (!outputEl.value) return;
+      const blob = new Blob([outputEl.value], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'data.csv'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      inputEl.value = ''; outputEl.value = ''; statusEl.textContent = '';
+    });
+  </script>
+
+  <style>
+    .convert-status { margin-top: 8px; font-size: 0.85rem; min-height: 1.5em; }
+  </style>
+</ToolLayout>

@@ -1,0 +1,98 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+const tool = getToolBySlug('html-entity-encoder')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <button id="btn-encode" class="btn btn-primary">Encode</button>
+    <button id="btn-decode" class="btn btn-primary">Decode</button>
+    <button id="btn-copy" class="btn">Copy</button>
+    <button id="btn-clear" class="btn">Clear</button>
+  </div>
+
+  <div class="tool-panels">
+    <div class="tool-panel">
+      <label for="entity-input">Input</label>
+      <textarea id="entity-input" placeholder='<div class="hello">&amp; "quotes"'><h1>Hello & welcome!</h1>
+<p>Use &lt;code&gt; for "inline code" — it's <strong>important</strong>.</p>
+<script>alert('xss')</script></textarea>
+    </div>
+    <div class="tool-panel">
+      <label for="entity-output">Output</label>
+      <textarea id="entity-output" placeholder="Result will appear here…" readonly></textarea>
+    </div>
+  </div>
+
+  <div class="entity-ref">
+    <h4>Common HTML Entities</h4>
+    <div class="entity-table">
+      <span class="entity-item" title="Click to copy" data-entity="&amp;lt;">&lt; → &amp;lt;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;gt;">&gt; → &amp;gt;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;amp;">&amp; → &amp;amp;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;quot;">" → &amp;quot;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;apos;">' → &amp;apos;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;nbsp;">  → &amp;nbsp;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;copy;">© → &amp;copy;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;reg;">® → &amp;reg;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;trade;">™ → &amp;trade;</span>
+      <span class="entity-item" title="Click to copy" data-entity="&amp;mdash;">— → &amp;mdash;</span>
+    </div>
+  </div>
+
+  <div slot="info">
+    <h2>How to Use</h2>
+    <p>Paste HTML or text containing special characters into the input. Click <strong>Encode</strong> to convert special characters (&lt;, &gt;, &amp;, ", ') to their HTML entity equivalents, or click <strong>Decode</strong> to convert entities back to characters.</p>
+    <h3>Why Encode HTML Entities?</h3>
+    <p>HTML entity encoding prevents browsers from interpreting special characters as markup. This is essential for displaying code snippets on web pages, preventing XSS (cross-site scripting) attacks, and ensuring special characters render correctly in all browsers.</p>
+  </div>
+
+  <script is:inline>
+    function encodeEntities(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function decodeEntities(str) {
+      const el = document.createElement('textarea');
+      el.innerHTML = str;
+      return el.value;
+    }
+
+    const inputEl = document.getElementById('entity-input');
+    const outputEl = document.getElementById('entity-output');
+
+    document.getElementById('btn-encode').addEventListener('click', () => {
+      outputEl.value = encodeEntities(inputEl.value);
+    });
+    document.getElementById('btn-decode').addEventListener('click', () => {
+      outputEl.value = decodeEntities(inputEl.value);
+    });
+    document.getElementById('btn-copy').addEventListener('click', () => {
+      if (outputEl.value) navigator.clipboard.writeText(outputEl.value).then(() => showToast('Copied!'));
+    });
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      inputEl.value = ''; outputEl.value = '';
+    });
+
+    document.querySelectorAll('.entity-item').forEach(el => {
+      el.addEventListener('click', () => {
+        navigator.clipboard.writeText(el.dataset.entity).then(() => showToast('Copied!'));
+      });
+      el.style.cursor = 'pointer';
+    });
+  </script>
+
+  <style>
+    .entity-ref { margin-top: 16px; }
+    .entity-ref h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+    .entity-table { display: flex; flex-wrap: wrap; gap: 8px; }
+    .entity-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-family: monospace; font-size: 0.8rem; transition: border-color 0.2s; }
+    .entity-item:hover { border-color: var(--accent); }
+  </style>
+</ToolLayout>
