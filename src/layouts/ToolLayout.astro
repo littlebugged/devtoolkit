@@ -62,8 +62,11 @@ const structuredData = {
       <span class="ad-label">Advertisement</span>
     </div>
 
-    <!-- SEO Content -->
-    <slot name="info" />
+    <!-- SEO Content (collapsed by default, search engines still read it) -->
+    <details class="tool-info-accordion">
+      <summary class="tool-info-toggle">Learn more about this tool</summary>
+      <slot name="info" />
+    </details>
 
     <!-- Bottom Ad -->
     <div class="ad-container ad-bottom" id="ad-bottom">

@@ -45,17 +45,51 @@ import { categories, tools, getToolsByCategory } from '../data/tools';
     <span class="ad-label">Advertisement</span>
   </div>
 
-  <!-- SEO content block -->
-  <div class="tool-info" style="margin-top: 2rem;">
-    <h2>Why Use DevToolKit?</h2>
-    <p>DevToolKit provides a collection of free, fast, and privacy-focused online tools for developers, designers, and everyday users. Every tool runs 100% in your browser — your data never leaves your device.</p>
-    <h3>Key Features</h3>
-    <ul>
-      <li><strong>100% Client-Side</strong> — All processing happens in your browser. No server, no data collection.</li>
-      <li><strong>No Signup Required</strong> — Use any tool instantly, no account needed.</li>
-      <li><strong>Fast &amp; Lightweight</strong> — Optimized for speed with minimal page load times.</li>
-      <li><strong>Mobile Friendly</strong> — Works perfectly on phones, tablets, and desktops.</li>
-      <li><strong>Free Forever</strong> — All tools are completely free to use.</li>
-    </ul>
-  </div>
+  <!-- FAQ Schema: invisible to users, readable by Google for rich snippets -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is DevToolKit?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'DevToolKit is a collection of free, fast, and privacy-focused online tools for developers, designers, and everyday users. Every tool runs 100% in your browser — your data never leaves your device.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Is DevToolKit free to use?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, all tools on DevToolKit are completely free to use. No signup, no account, and no hidden costs. Just open a tool and start using it instantly.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Is my data safe when using DevToolKit?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Absolutely. All tools run 100% client-side in your browser using JavaScript. Your data is never uploaded to any server, never stored, and never shared with anyone.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What tools are available on DevToolKit?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'DevToolKit offers JSON Formatter & Validator, Base64 Encoder/Decoder, URL Encoder/Decoder, UUID Generator, Hash Generator (SHA-1, SHA-256, SHA-512), Password Generator, Color Picker & Converter, Unix Timestamp Converter, Lorem Ipsum Generator, Word & Character Counter, Text Case Converter, and Markdown Preview.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Does DevToolKit work on mobile devices?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, DevToolKit is fully responsive and works perfectly on phones, tablets, and desktops. All tools are optimized for touch interfaces and smaller screens.'
+        }
+      }
+    ]
+  })} />
 </BaseLayout>

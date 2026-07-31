@@ -722,6 +722,43 @@ input[type="color"]::-webkit-color-swatch {
   margin-top: 0.25rem;
 }
 
+/* Accordion for SEO content */
+.tool-info-accordion {
+  margin-top: 1rem;
+}
+
+.tool-info-toggle {
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s;
+}
+
+.tool-info-toggle:hover {
+  color: var(--color-text);
+}
+
+.tool-info-toggle::before {
+  content: '▸';
+  transition: transform 0.2s;
+}
+
+.tool-info-accordion[open] .tool-info-toggle::before {
+  transform: rotate(90deg);
+}
+
+.tool-info-toggle::-webkit-details-marker {
+  display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .hero h1 {
