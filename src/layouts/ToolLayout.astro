@@ -1,6 +1,8 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import AdBanner from '../components/AdBanner.astro';
+import AdNative from '../components/AdNative.astro';
+import AdMobile from '../components/AdMobile.astro';
 import type { Tool } from '../data/tools';
 import { tools } from '../data/tools';
 
@@ -56,8 +58,9 @@ const structuredData = {
       <slot />
     </div>
 
-    <!-- Middle Ad -->
-    <AdBanner id="ad-middle" class="ad-middle" />
+    <!-- Middle Ad: Native banner for desktop, mobile banner for mobile -->
+    <AdNative id="ad-middle" class="ad-middle ad-desktop-only" />
+    <AdMobile id="ad-middle-mobile" class="ad-middle ad-mobile-only" />
 
     <!-- SEO Content (collapsed by default, search engines still read it) -->
     <details class="tool-info-accordion">
@@ -66,7 +69,8 @@ const structuredData = {
     </details>
 
     <!-- Bottom Ad -->
-    <AdBanner id="ad-bottom" class="ad-bottom" />
+    <AdBanner id="ad-bottom" class="ad-bottom ad-desktop-only" />
+    <AdMobile id="ad-bottom-mobile" class="ad-bottom ad-mobile-only" />
 
     {relatedTools.length > 0 && (
       <div class="related-tools">

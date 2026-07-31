@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AdBanner from '../components/AdBanner.astro';
+import AdNative from '../components/AdNative.astro';
+import AdMobile from '../components/AdMobile.astro';
 import { categories, tools, getToolsByCategory } from '../data/tools';
 ---
 
@@ -40,7 +42,8 @@ import { categories, tools, getToolsByCategory } from '../data/tools';
   })}
 
   <!-- Bottom Ad -->
-  <AdBanner id="ad-home-bottom" class="ad-bottom" />
+  <AdNative id="ad-home-bottom" class="ad-bottom ad-desktop-only" />
+  <AdMobile id="ad-home-bottom-mobile" class="ad-bottom ad-mobile-only" />
 
   <!-- FAQ Schema: invisible to users, readable by Google for rich snippets -->
   <script type="application/ld+json" set:html={JSON.stringify({

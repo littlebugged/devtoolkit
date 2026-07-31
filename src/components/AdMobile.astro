@@ -1,0 +1,21 @@
+---
+interface Props {
+  id?: string;
+  class?: string;
+}
+
+const { id, class: className = '' } = Astro.props;
+---
+
+<div class={`ad-container ad-mobile ${className}`} id={id}>
+  <script is:inline>
+    atOptions = {
+      'key' : '39dadd8402e5535e2cc01e654c00b6c8',
+      'format' : 'iframe',
+      'height' : 50,
+      'width' : 320,
+      'params' : {}
+    };
+  </script>
+  <script is:inline src="https://www.highperformanceformat.com/39dadd8402e5535e2cc01e654c00b6c8/invoke.js"></script>
+</div>

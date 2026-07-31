@@ -722,6 +722,24 @@ input[type="color"]::-webkit-color-swatch {
   margin-top: 0.25rem;
 }
 
+/* Responsive ad display */
+.ad-mobile-only {
+  display: none;
+}
+
+.ad-mobile {
+  min-height: 50px;
+}
+
+@media (max-width: 768px) {
+  .ad-desktop-only {
+    display: none;
+  }
+  .ad-mobile-only {
+    display: flex;
+  }
+}
+
 /* Accordion for SEO content */
 .tool-info-accordion {
   margin-top: 1rem;
