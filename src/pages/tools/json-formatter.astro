@@ -12,6 +12,7 @@ const tool = getToolBySlug('json-formatter')!;
     <button type="button" class="btn" id="btn-validate">Validate</button>
     <button type="button" class="btn" id="btn-copy">Copy</button>
     <button type="button" class="btn" id="btn-clear">Clear</button>
+    <button type="button" class="btn btn-toggle" id="btn-tree">Tree View</button>
   </div>
 
   <div id="json-status" class="json-status" aria-live="polite"></div>
@@ -19,11 +20,12 @@ const tool = getToolBySlug('json-formatter')!;
   <div class="tool-io">
     <div class="io-panel">
       <label for="json-input">Input</label>
-      <textarea id="json-input" placeholder='{"name": "example", "items": [1, 2, 3]}' spellcheck="false"></textarea>
+      <textarea id="json-input" placeholder='Paste JSON here…' spellcheck="false"></textarea>
     </div>
     <div class="io-panel">
-      <label for="json-output">Output</label>
+      <label>Output</label>
       <textarea id="json-output" placeholder="Formatted JSON will appear here…" readonly spellcheck="false"></textarea>
+      <div id="json-tree" class="json-tree" style="display:none;"></div>
     </div>
   </div>
 
@@ -32,8 +34,8 @@ const tool = getToolBySlug('json-formatter')!;
     <p>
       Paste your JSON into the input panel on the left. Click <strong>Format</strong> to beautify it with
       readable indentation, or <strong>Minify</strong> to compress it into a single line. Use
-      <strong>Validate</strong> to check whether your JSON is syntactically correct. The tool auto-detects
-      validity as you type and highlights any syntax errors.
+      <strong>Validate</strong> to check whether your JSON is syntactically correct. Click <strong>Tree View</strong>
+      for an interactive collapsible tree with array indices and type indicators.
     </p>
     <h3>What is JSON Formatting?</h3>
     <p>
@@ -56,25 +58,62 @@ const tool = getToolBySlug('json-formatter')!;
       margin-bottom: 0.75rem;
       min-height: 1.25rem;
     }
-    .json-status.valid {
-      color: var(--color-success);
+    .json-status.valid { color: var(--color-success); }
+    .json-status.invalid { color: var(--color-error); }
+    textarea.json-valid { border-color: var(--color-success); }
+    textarea.json-invalid { border-color: var(--color-error); }
+    .btn-toggle { font-size: 0.8rem; }
+    .btn-toggle.active {
+      background: var(--color-primary);
+      color: #fff;
     }
-    .json-status.invalid {
-      color: var(--color-error);
+
+    .json-tree {
+      background: var(--color-input-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      max-height: 500px;
+      overflow-y: auto;
+      min-height: 200px;
     }
-    textarea.json-valid {
-      border-color: var(--color-success);
+
+    .jt-row { display: flex; }
+    .jt-toggle {
+      cursor: pointer;
+      user-select: none;
+      width: 16px;
+      display: inline-block;
+      text-align: center;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
     }
-    textarea.json-invalid {
-      border-color: var(--color-error);
-    }
+    .jt-toggle:hover { color: var(--color-primary); }
+    .jt-key { color: #93c5fd; }
+    .jt-idx { color: #a78bfa; font-size: 0.75rem; opacity: 0.7; }
+    .jt-str { color: #86efac; }
+    .jt-num { color: #fbbf24; }
+    .jt-bool { color: #f472b6; }
+    .jt-null { color: #94a3b8; font-style: italic; }
+    .jt-bracket { color: var(--color-text-muted); }
+    .jt-comma { color: var(--color-text-muted); }
+    .jt-type { color: var(--color-text-muted); font-size: 0.7rem; margin-left: 6px; opacity: 0.6; }
+    .jt-children { padding-left: 20px; }
+    .jt-collapsed .jt-children { display: none; }
+    .jt-collapsed .jt-ellipsis { display: inline; }
+    .jt-ellipsis { display: none; color: var(--color-text-muted); }
   </style>
 
   <script is:inline>
     (function () {
       var input = document.getElementById('json-input');
       var output = document.getElementById('json-output');
+      var treeEl = document.getElementById('json-tree');
       var status = document.getElementById('json-status');
+      var treeMode = false;
 
       function parseInput() {
         var text = input.value.trim();
@@ -94,68 +133,135 @@ const tool = getToolBySlug('json-formatter')!;
           return;
         }
         if (result.ok) {
-          status.textContent = '✓ Valid JSON';
+          status.textContent = '\u2713 Valid JSON';
           status.className = 'json-status valid';
           input.classList.add('json-valid');
         } else {
-          status.textContent = '✗ Invalid JSON: ' + result.error;
+          status.textContent = '\u2717 Invalid JSON: ' + result.error;
           status.className = 'json-status invalid';
           input.classList.add('json-invalid');
         }
       }
 
+      function escHtml(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function buildTree(data, key, isLast, isArrayItem, arrayIndex) {
+        var type = data === null ? 'null' : Array.isArray(data) ? 'array' : typeof data;
+        var html = '<div class="jt-row">';
+
+        if (type === 'object' || type === 'array') {
+          var entries = type === 'array' ? data : Object.entries(data);
+          var count = type === 'array' ? data.length : Object.keys(data).length;
+          var openBracket = type === 'array' ? '[' : '{';
+          var closeBracket = type === 'array' ? ']' : '}';
+
+          html += '<span class="jt-toggle" onclick="this.parentElement.parentElement.classList.toggle(\'jt-collapsed\')">\u25BE</span>';
+
+          if (key !== undefined) {
+            if (isArrayItem) {
+              html += '<span class="jt-idx">' + arrayIndex + '</span> ';
+            } else {
+              html += '<span class="jt-key">"' + escHtml(key) + '"</span>: ';
+            }
+          }
+
+          html += '<span class="jt-bracket">' + openBracket + '</span>';
+          html += '<span class="jt-ellipsis"> ... </span>';
+          html += '<span class="jt-type">' + count + ' ' + (type === 'array' ? 'items' : 'keys') + '</span>';
+          html += '</div>';
+
+          html += '<div class="jt-children">';
+          if (type === 'array') {
+            data.forEach(function (item, i) {
+              html += '<div>' + buildTree(item, undefined, i === data.length - 1, true, i) + '</div>';
+            });
+          } else {
+            var keys = Object.keys(data);
+            keys.forEach(function (k, i) {
+              html += '<div>' + buildTree(data[k], k, i === keys.length - 1, false) + '</div>';
+            });
+          }
+          html += '</div>';
+          html += '<div class="jt-row"><span style="width:16px;display:inline-block;"></span><span class="jt-bracket">' + closeBracket + '</span>' + (isLast ? '' : '<span class="jt-comma">,</span>') + '</div>';
+          return html;
+        }
+
+        html += '<span style="width:16px;display:inline-block;"></span>';
+        if (key !== undefined) {
+          if (isArrayItem) {
+            html += '<span class="jt-idx">' + arrayIndex + '</span> ';
+          } else {
+            html += '<span class="jt-key">"' + escHtml(key) + '"</span>: ';
+          }
+        }
+
+        if (type === 'string') {
+          html += '<span class="jt-str">"' + escHtml(data) + '"</span>';
+        } else if (type === 'number') {
+          html += '<span class="jt-num">' + data + '</span>';
+        } else if (type === 'boolean') {
+          html += '<span class="jt-bool">' + data + '</span>';
+        } else {
+          html += '<span class="jt-null">null</span>';
+        }
+
+        if (!isLast) html += '<span class="jt-comma">,</span>';
+        html += '</div>';
+        return html;
+      }
+
+      function renderTree() {
+        var result = parseInput();
+        setStatus(result);
+        if (result.empty || !result.ok) {
+          treeEl.innerHTML = result.empty ? '<span style="color:var(--color-text-muted)">Paste JSON and click Format or Tree View</span>' : '';
+          return;
+        }
+        treeEl.innerHTML = buildTree(result.data, undefined, true, false);
+      }
+
       function formatJson(spaces) {
         var result = parseInput();
-        if (result.empty) {
-          showToast('Input is empty');
-          return;
-        }
-        if (!result.ok) {
-          setStatus(result);
-          showToast('Fix JSON errors first');
-          return;
-        }
+        if (result.empty) { showToast('Input is empty'); return; }
+        if (!result.ok) { setStatus(result); showToast('Fix JSON errors first'); return; }
         output.value = JSON.stringify(result.data, null, spaces);
         setStatus(result);
+        if (treeMode) renderTree();
       }
 
       input.addEventListener('input', function () {
         setStatus(parseInput());
+        if (treeMode) renderTree();
       });
 
-      document.getElementById('btn-format').addEventListener('click', function () {
-        formatJson(2);
-      });
-
-      document.getElementById('btn-minify').addEventListener('click', function () {
-        formatJson(0);
-      });
-
+      document.getElementById('btn-format').addEventListener('click', function () { formatJson(2); });
+      document.getElementById('btn-minify').addEventListener('click', function () { formatJson(0); });
       document.getElementById('btn-validate').addEventListener('click', function () {
         var result = parseInput();
         setStatus(result);
-        if (result.empty) {
-          showToast('Input is empty');
-        } else if (result.ok) {
-          showToast('Valid JSON');
-        } else {
-          showToast('Invalid JSON');
-        }
+        if (result.empty) showToast('Input is empty');
+        else if (result.ok) showToast('Valid JSON');
+        else showToast('Invalid JSON');
       });
-
       document.getElementById('btn-copy').addEventListener('click', function () {
         var text = output.value || input.value;
-        if (!text) {
-          showToast('Nothing to copy');
-          return;
-        }
+        if (!text) { showToast('Nothing to copy'); return; }
         copyText(text);
       });
-
       document.getElementById('btn-clear').addEventListener('click', function () {
-        input.value = '';
-        output.value = '';
+        input.value = ''; output.value = '';
+        treeEl.innerHTML = '';
         setStatus({ ok: true, empty: true });
+      });
+
+      document.getElementById('btn-tree').addEventListener('click', function () {
+        treeMode = !treeMode;
+        this.classList.toggle('active', treeMode);
+        output.style.display = treeMode ? 'none' : '';
+        treeEl.style.display = treeMode ? '' : 'none';
+        if (treeMode) renderTree();
       });
     })();
   </script>
