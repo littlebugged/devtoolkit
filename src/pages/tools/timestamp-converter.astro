@@ -1,0 +1,176 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('timestamp-converter')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="stats-grid" style="margin-bottom: 1.5rem;">
+    <div class="stat-card">
+      <div class="stat-value" id="current-ts">—</div>
+      <div class="stat-label">Current Unix Timestamp</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="current-ms" style="font-size: 1.1rem;">—</div>
+      <div class="stat-label">Milliseconds</div>
+    </div>
+  </div>
+
+  <div class="tool-controls">
+    <button type="button" class="btn btn-primary" id="btn-now">Now</button>
+  </div>
+
+  <div class="tool-io">
+    <div class="io-panel">
+      <label for="ts-input">Unix Timestamp → Date</label>
+      <input type="text" id="ts-input" placeholder="e.g. 1704067200 or 1704067200000" spellcheck="false" />
+      <div id="ts-output" style="margin-top: 0.75rem;">
+        <div class="hash-item">
+          <label>ISO 8601</label>
+          <div class="result-box" id="ts-iso" title="Click to copy">—</div>
+        </div>
+        <div class="hash-item" style="margin-top: 0.5rem;">
+          <label>UTC</label>
+          <div class="result-box" id="ts-utc" title="Click to copy">—</div>
+        </div>
+        <div class="hash-item" style="margin-top: 0.5rem;">
+          <label>Local</label>
+          <div class="result-box" id="ts-local" title="Click to copy">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="io-panel">
+      <label for="date-input">Date String → Timestamp</label>
+      <input type="text" id="date-input" placeholder="e.g. 2024-01-01 or Jan 1, 2024 12:00:00" spellcheck="false" />
+      <div style="margin-top: 0.75rem;">
+        <div class="hash-item">
+          <label>Unix Timestamp (seconds)</label>
+          <div class="result-box" id="date-ts-sec" title="Click to copy">—</div>
+        </div>
+        <div class="hash-item" style="margin-top: 0.5rem;">
+          <label>Unix Timestamp (milliseconds)</label>
+          <div class="result-box" id="date-ts-ms" title="Click to copy">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      The current Unix timestamp updates live at the top. Enter a timestamp (seconds or milliseconds)
+      in the left panel to see the equivalent date in ISO, UTC, and local formats. Enter a date string
+      in the right panel to get the corresponding Unix timestamp. Click any result to copy it, or use
+      the <strong>Now</strong> button to fill in the current timestamp.
+    </p>
+    <h3>What is a Unix Timestamp?</h3>
+    <p>
+      A Unix timestamp (also called epoch time) represents the number of seconds that have elapsed since
+      January 1, 1970, 00:00:00 UTC — known as the Unix epoch. It is a universal, timezone-independent
+      way to represent a point in time, widely used in programming, databases, APIs, and log files.
+    </p>
+    <h3>Seconds vs Milliseconds</h3>
+    <p>
+      Standard Unix timestamps count seconds (10 digits for dates through 2286). JavaScript and many
+      modern systems use milliseconds (13 digits). This tool auto-detects the format: values with more
+      than 10 digits are treated as milliseconds.
+    </p>
+    <h3>Common Use Cases</h3>
+    <p>
+      Debug API responses, decode log timestamps, verify JWT expiration claims, convert database epoch
+      values, and quickly check whether a timestamp is in the past or future during development.
+    </p>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var currentTsEl = document.getElementById('current-ts');
+      var currentMsEl = document.getElementById('current-ms');
+      var tsInput = document.getElementById('ts-input');
+      var dateInput = document.getElementById('date-input');
+      var tsIso = document.getElementById('ts-iso');
+      var tsUtc = document.getElementById('ts-utc');
+      var tsLocal = document.getElementById('ts-local');
+      var dateTsSec = document.getElementById('date-ts-sec');
+      var dateTsMs = document.getElementById('date-ts-ms');
+
+      function parseTimestamp(raw) {
+        var trimmed = raw.trim();
+        if (!trimmed) return null;
+        var num = Number(trimmed);
+        if (isNaN(num)) return null;
+        if (trimmed.length > 10 || num > 1e12) {
+          return new Date(num);
+        }
+        return new Date(num * 1000);
+      }
+
+      function setResult(el, value) {
+        el.textContent = value || '—';
+        el.dataset.value = value || '';
+      }
+
+      function updateCurrentTime() {
+        var now = Date.now();
+        var sec = Math.floor(now / 1000);
+        currentTsEl.textContent = sec;
+        currentMsEl.textContent = now;
+      }
+
+      function convertTimestampToDate() {
+        var date = parseTimestamp(tsInput.value);
+        if (!date || isNaN(date.getTime())) {
+          setResult(tsIso, '');
+          setResult(tsUtc, '');
+          setResult(tsLocal, '');
+          return;
+        }
+
+        setResult(tsIso, date.toISOString());
+        setResult(tsUtc, date.toUTCString());
+        setResult(tsLocal, date.toLocaleString());
+      }
+
+      function convertDateToTimestamp() {
+        var raw = dateInput.value.trim();
+        if (!raw) {
+          setResult(dateTsSec, '');
+          setResult(dateTsMs, '');
+          return;
+        }
+
+        var date = new Date(raw);
+        if (isNaN(date.getTime())) {
+          setResult(dateTsSec, 'Invalid date');
+          setResult(dateTsMs, 'Invalid date');
+          return;
+        }
+
+        var ms = date.getTime();
+        setResult(dateTsSec, String(Math.floor(ms / 1000)));
+        setResult(dateTsMs, String(ms));
+      }
+
+      function bindCopy(el) {
+        el.addEventListener('click', function () {
+          if (el.dataset.value) copyText(el.dataset.value);
+        });
+      }
+
+      [tsIso, tsUtc, tsLocal, dateTsSec, dateTsMs].forEach(bindCopy);
+
+      tsInput.addEventListener('input', convertTimestampToDate);
+      dateInput.addEventListener('input', convertDateToTimestamp);
+
+      document.getElementById('btn-now').addEventListener('click', function () {
+        var sec = Math.floor(Date.now() / 1000);
+        tsInput.value = String(sec);
+        convertTimestampToDate();
+      });
+
+      updateCurrentTime();
+      setInterval(updateCurrentTime, 1000);
+    })();
+  </script>
+</ToolLayout>

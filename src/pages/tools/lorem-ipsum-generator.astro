@@ -1,0 +1,171 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('lorem-ipsum-generator')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <label for="lorem-type" style="display: flex; align-items: center; gap: 0.5rem;">
+      Type:
+      <select id="lorem-type" class="btn btn-sm">
+        <option value="paragraphs">Paragraphs</option>
+        <option value="sentences">Sentences</option>
+        <option value="words">Words</option>
+      </select>
+    </label>
+    <label for="lorem-count" style="display: flex; align-items: center; gap: 0.5rem;">
+      Count:
+      <input type="number" id="lorem-count" min="1" max="50" value="3" class="btn btn-sm" style="width: 4rem;" />
+    </label>
+    <button type="button" class="btn btn-primary" id="btn-generate">Generate</button>
+    <button type="button" class="btn" id="btn-copy">Copy</button>
+  </div>
+
+  <div class="tool-io tool-io-single">
+    <div class="io-panel">
+      <label for="lorem-output">Generated Text</label>
+      <textarea id="lorem-output" readonly placeholder="Click Generate to create Lorem Ipsum text…" spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Choose whether you want <strong>paragraphs</strong>, <strong>sentences</strong>, or
+      <strong>words</strong>, set the count (1–50), and click <strong>Generate</strong>. Use
+      <strong>Copy</strong> to copy the result to your clipboard for use in mockups, wireframes, or
+      design prototypes.
+    </p>
+    <h3>What is Lorem Ipsum?</h3>
+    <p>
+      Lorem Ipsum is placeholder text derived from a scrambled Latin passage by Cicero. Designers and
+      developers use it to fill layouts without distracting viewers with meaningful content. It helps
+      evaluate typography, spacing, and visual hierarchy before real copy is available.
+    </p>
+    <h3>When to Use Placeholder Text</h3>
+    <p>
+      Use Lorem Ipsum in website mockups, app wireframes, print layouts, and presentations where you
+      need realistic-looking text blocks. Generate just enough content — a few paragraphs for a hero
+      section, or a handful of words for a button label placeholder.
+    </p>
+    <h3>Privacy</h3>
+    <p>
+      All text is generated locally in your browser. Nothing is sent to a server.
+    </p>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var WORDS = [
+        'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do',
+        'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua', 'enim',
+        'ad', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi',
+        'aliquip', 'ex', 'ea', 'commodo', 'consequat', 'duis', 'aute', 'irure', 'in', 'reprehenderit',
+        'voluptate', 'velit', 'esse', 'cillum', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint',
+        'occaecat', 'cupidatat', 'non', 'proident', 'sunt', 'culpa', 'qui', 'officia', 'deserunt',
+        'mollit', 'anim', 'id', 'est', 'laborum', 'at', 'vero', 'eos', 'accusamus', 'iusto', 'odio',
+        'dignissimos', 'ducimus', 'blanditiis', 'praesentium', 'voluptatum', 'deleniti', 'atque',
+        'corrupti', 'quos', 'dolores', 'quas', 'molestias', 'excepturi', 'obcaecati', 'cupiditate',
+        'provident', 'similique', 'architecto', 'beatae', 'vitae', 'dicta', 'repellendus', 'temporibus',
+        'quidem', 'rerum', 'facilis', 'expedita', 'distinctio', 'nam', 'libero', 'tempore', 'cum',
+        'soluta', 'nobis', 'eligendi', 'optio', 'cumque', 'nihil', 'impedit', 'quo', 'minus'
+      ];
+
+      var typeSelect = document.getElementById('lorem-type');
+      var countInput = document.getElementById('lorem-count');
+      var output = document.getElementById('lorem-output');
+
+      function randomInt(max) {
+        return Math.floor(Math.random() * max);
+      }
+
+      function randomWord() {
+        return WORDS[randomInt(WORDS.length)];
+      }
+
+      function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+
+      function generateSentence() {
+        var len = randomInt(8) + 6;
+        var words = [];
+        for (var i = 0; i < len; i++) {
+          words.push(randomWord());
+        }
+        return capitalize(words.join(' ')) + '.';
+      }
+
+      function generateParagraph() {
+        var count = randomInt(4) + 3;
+        var sentences = [];
+        for (var i = 0; i < count; i++) {
+          sentences.push(generateSentence());
+        }
+        return sentences.join(' ');
+      }
+
+      function generateWords(count) {
+        var words = [];
+        for (var i = 0; i < count; i++) {
+          words.push(randomWord());
+        }
+        return words.join(' ');
+      }
+
+      function generateSentences(count) {
+        var sentences = [];
+        for (var i = 0; i < count; i++) {
+          sentences.push(generateSentence());
+        }
+        return sentences.join(' ');
+      }
+
+      function generateParagraphs(count) {
+        var paragraphs = [];
+        for (var i = 0; i < count; i++) {
+          paragraphs.push(generateParagraph());
+        }
+        return paragraphs.join('\n\n');
+      }
+
+      function generate() {
+        var type = typeSelect.value;
+        var count = parseInt(countInput.value, 10);
+        if (isNaN(count) || count < 1) count = 1;
+        if (count > 50) count = 50;
+        countInput.value = count;
+
+        var text;
+        if (type === 'words') {
+          text = generateWords(count);
+        } else if (type === 'sentences') {
+          text = generateSentences(count);
+        } else {
+          text = generateParagraphs(count);
+        }
+        output.value = text;
+      }
+
+      document.getElementById('btn-generate').addEventListener('click', generate);
+
+      document.getElementById('btn-copy').addEventListener('click', function () {
+        if (!output.value) {
+          showToast('Nothing to copy');
+          return;
+        }
+        copyText(output.value);
+      });
+
+      countInput.addEventListener('change', function () {
+        var count = parseInt(countInput.value, 10);
+        if (isNaN(count) || count < 1) countInput.value = 1;
+        if (count > 50) countInput.value = 50;
+      });
+
+      generate();
+    })();
+  </script>
+</ToolLayout>

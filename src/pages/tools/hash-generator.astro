@@ -1,0 +1,129 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('hash-generator')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-io tool-io-single">
+    <div class="io-panel">
+      <label for="hash-input">Input Text</label>
+      <textarea id="hash-input" placeholder="Enter text to hash…" spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div class="hash-results" id="hash-results" aria-live="polite">
+    <div class="hash-item">
+      <label>SHA-1</label>
+      <div class="result-box" id="hash-sha1" title="Click to copy">—</div>
+    </div>
+    <div class="hash-item">
+      <label>SHA-256</label>
+      <div class="result-box" id="hash-sha256" title="Click to copy">—</div>
+    </div>
+    <div class="hash-item">
+      <label>SHA-512</label>
+      <div class="result-box" id="hash-sha512" title="Click to copy">—</div>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Type or paste any text into the input field. SHA-1, SHA-256, and SHA-512 hashes are computed
+      automatically as you type. Click any hash result to copy it to your clipboard.
+    </p>
+    <h3>What is a Cryptographic Hash?</h3>
+    <p>
+      A cryptographic hash function takes an input of arbitrary length and produces a fixed-size
+      string of characters. The same input always yields the same hash, but even a tiny change in
+      the input produces a completely different output. Hashes are one-way — you cannot recover the
+      original text from a hash.
+    </p>
+    <h3>SHA Algorithms</h3>
+    <p>
+      <strong>SHA-1</strong> produces a 160-bit (40 hex character) digest. It is considered weak for
+      security purposes but still useful for checksums and legacy compatibility.
+      <strong>SHA-256</strong> and <strong>SHA-512</strong> are part of the SHA-2 family and are
+      widely used for password storage, digital signatures, blockchain, and data integrity verification.
+    </p>
+    <h3>Client-Side &amp; Secure</h3>
+    <p>
+      This tool uses the browser's native <code>crypto.subtle.digest</code> Web Crypto API. All
+      hashing happens locally in your browser — your data is never sent to any server. Note that
+      MD5 is not available through the Web Crypto API and is omitted here; use SHA-256 or SHA-512
+      for modern security needs.
+    </p>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var input = document.getElementById('hash-input');
+      var sha1El = document.getElementById('hash-sha1');
+      var sha256El = document.getElementById('hash-sha256');
+      var sha512El = document.getElementById('hash-sha512');
+      var debounceTimer = null;
+
+      function bufferToHex(buffer) {
+        var bytes = new Uint8Array(buffer);
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+          hex += bytes[i].toString(16).padStart(2, '0');
+        }
+        return hex;
+      }
+
+      function digest(algorithm, text) {
+        var encoder = new TextEncoder();
+        return crypto.subtle.digest(algorithm, encoder.encode(text)).then(bufferToHex);
+      }
+
+      function setHash(el, value) {
+        el.textContent = value || '—';
+        el.dataset.hash = value || '';
+      }
+
+      function computeHashes() {
+        var text = input.value;
+        if (!text) {
+          setHash(sha1El, '');
+          setHash(sha256El, '');
+          setHash(sha512El, '');
+          return;
+        }
+
+        Promise.all([
+          digest('SHA-1', text),
+          digest('SHA-256', text),
+          digest('SHA-512', text),
+        ]).then(function (results) {
+          setHash(sha1El, results[0]);
+          setHash(sha256El, results[1]);
+          setHash(sha512El, results[2]);
+        }).catch(function () {
+          setHash(sha1El, 'Error');
+          setHash(sha256El, 'Error');
+          setHash(sha512El, 'Error');
+        });
+      }
+
+      function scheduleCompute() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(computeHashes, 150);
+      }
+
+      sha1El.addEventListener('click', function () {
+        if (sha1El.dataset.hash) copyText(sha1El.dataset.hash);
+      });
+      sha256El.addEventListener('click', function () {
+        if (sha256El.dataset.hash) copyText(sha256El.dataset.hash);
+      });
+      sha512El.addEventListener('click', function () {
+        if (sha512El.dataset.hash) copyText(sha512El.dataset.hash);
+      });
+
+      input.addEventListener('input', scheduleCompute);
+    })();
+  </script>
+</ToolLayout>

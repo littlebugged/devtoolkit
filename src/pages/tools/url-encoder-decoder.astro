@@ -1,0 +1,140 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('url-encoder-decoder')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <button type="button" class="btn btn-primary" id="btn-encode">Encode</button>
+    <button type="button" class="btn" id="btn-decode">Decode</button>
+    <button type="button" class="btn" id="btn-encode-component">Encode Component</button>
+    <button type="button" class="btn" id="btn-copy">Copy</button>
+    <button type="button" class="btn" id="btn-clear">Clear</button>
+  </div>
+
+  <div id="url-status" class="url-status" aria-live="polite"></div>
+
+  <div class="tool-io">
+    <div class="io-panel">
+      <label for="url-input">Input</label>
+      <textarea id="url-input" placeholder="Enter a URL or text to encode/decode…" spellcheck="false"></textarea>
+    </div>
+    <div class="io-panel">
+      <label for="url-output">Output</label>
+      <textarea id="url-output" placeholder="Result will appear here…" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Paste a URL or text string into the input panel. Click <strong>Encode</strong> to percent-encode a full
+      URL (preserving reserved characters like <code>:</code> and <code>/</code>), or
+      <strong>Encode Component</strong> to encode individual query parameter values. Click
+      <strong>Decode</strong> to reverse percent-encoding back to readable text.
+    </p>
+    <h3>What is URL Encoding?</h3>
+    <p>
+      URL encoding (percent-encoding) converts characters that are not allowed in URLs into a safe format using
+      a <code>%</code> followed by two hexadecimal digits. For example, a space becomes <code>%20</code> and
+      <code>&amp;</code> becomes <code>%26</code>. This ensures URLs transmit correctly across all browsers
+      and servers.
+    </p>
+    <h3>encodeURI vs encodeURIComponent</h3>
+    <p>
+      <code>encodeURI</code> encodes a complete URL but leaves structural characters (<code>://</code>,
+      <code>/</code>, <code>?</code>, <code>#</code>) intact. <code>encodeURIComponent</code> encodes every
+      special character and is the right choice for individual query parameter values or path segments.
+    </p>
+  </div>
+
+  <style>
+    .url-status {
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      min-height: 1.25rem;
+      color: var(--color-error);
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      var input = document.getElementById('url-input');
+      var output = document.getElementById('url-output');
+      var status = document.getElementById('url-status');
+
+      function showError(msg) {
+        status.textContent = msg;
+      }
+
+      function clearError() {
+        status.textContent = '';
+      }
+
+      document.getElementById('btn-encode').addEventListener('click', function () {
+        clearError();
+        var text = input.value;
+        if (!text) {
+          showToast('Input is empty');
+          return;
+        }
+        try {
+          output.value = encodeURI(text);
+        } catch (e) {
+          showError('Encode failed: ' + e.message);
+        }
+      });
+
+      document.getElementById('btn-encode-component').addEventListener('click', function () {
+        clearError();
+        var text = input.value;
+        if (!text) {
+          showToast('Input is empty');
+          return;
+        }
+        try {
+          output.value = encodeURIComponent(text);
+        } catch (e) {
+          showError('Encode failed: ' + e.message);
+        }
+      });
+
+      document.getElementById('btn-decode').addEventListener('click', function () {
+        clearError();
+        var text = input.value;
+        if (!text) {
+          showToast('Input is empty');
+          return;
+        }
+        try {
+          output.value = decodeURIComponent(text);
+        } catch (e) {
+          try {
+            output.value = decodeURI(text);
+          } catch (e2) {
+            showError('Decode failed: ' + e2.message);
+            output.value = '';
+          }
+        }
+      });
+
+      document.getElementById('btn-copy').addEventListener('click', function () {
+        var text = output.value;
+        if (!text) {
+          showToast('Nothing to copy');
+          return;
+        }
+        copyText(text);
+      });
+
+      document.getElementById('btn-clear').addEventListener('click', function () {
+        input.value = '';
+        output.value = '';
+        clearError();
+      });
+    })();
+  </script>
+</ToolLayout>

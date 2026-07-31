@@ -1,0 +1,223 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('color-picker')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="color-display" id="color-preview" aria-label="Color preview"></div>
+
+  <div style="margin: 1rem 0;">
+    <label for="color-picker-input" style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); display: block; margin-bottom: 0.5rem;">Pick Color</label>
+    <input type="color" id="color-picker-input" value="#6366f1" />
+  </div>
+
+  <div class="color-values">
+    <div class="color-value-item">
+      <label for="color-hex">HEX</label>
+      <input type="text" id="color-hex" value="#6366f1" spellcheck="false" />
+      <button type="button" class="btn btn-sm" data-copy="hex">Copy</button>
+    </div>
+    <div class="color-value-item">
+      <label for="color-rgb">RGB</label>
+      <input type="text" id="color-rgb" value="rgb(99, 102, 241)" spellcheck="false" />
+      <button type="button" class="btn btn-sm" data-copy="rgb">Copy</button>
+    </div>
+    <div class="color-value-item">
+      <label for="color-hsl">HSL</label>
+      <input type="text" id="color-hsl" value="hsl(239, 84%, 67%)" spellcheck="false" />
+      <button type="button" class="btn btn-sm" data-copy="hsl">Copy</button>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Use the color picker to visually select a color, or type values directly into the HEX, RGB, or
+      HSL fields. All formats stay in sync — changing any one updates the others and the preview
+      swatch instantly. Click <strong>Copy</strong> next to any format to copy that value.
+    </p>
+    <h3>Color Formats Explained</h3>
+    <p>
+      <strong>HEX</strong> (<code>#RRGGBB</code>) is the most common format in web development and
+      design tools. <strong>RGB</strong> (<code>rgb(r, g, b)</code>) defines colors by red, green, and
+      blue channel values from 0 to 255. <strong>HSL</strong> (<code>hsl(h, s%, l%)</code>) uses hue
+      (0–360°), saturation, and lightness — often more intuitive for adjusting brightness and tone.
+    </p>
+    <h3>When to Use Each Format</h3>
+    <p>
+      Use HEX in CSS, SVG, and design handoffs. RGB is ideal when working with image processing or
+      programmatic color manipulation. HSL is helpful when you need to create color palettes by
+      varying saturation or lightness while keeping the same hue.
+    </p>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var preview = document.getElementById('color-preview');
+      var pickerInput = document.getElementById('color-picker-input');
+      var hexInput = document.getElementById('color-hex');
+      var rgbInput = document.getElementById('color-rgb');
+      var hslInput = document.getElementById('color-hsl');
+      var updating = false;
+
+      function clamp(n, min, max) {
+        return Math.min(max, Math.max(min, n));
+      }
+
+      function hexToRgb(hex) {
+        hex = hex.replace(/^#/, '');
+        if (hex.length === 3) {
+          hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        if (hex.length !== 6) return null;
+        var num = parseInt(hex, 16);
+        if (isNaN(num)) return null;
+        return {
+          r: (num >> 16) & 255,
+          g: (num >> 8) & 255,
+          b: num & 255,
+        };
+      }
+
+      function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(function (v) {
+          return clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0');
+        }).join('');
+      }
+
+      function rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        var h = 0;
+        var s = 0;
+        var l = (max + min) / 2;
+
+        if (max !== min) {
+          var d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+            case g: h = ((b - r) / d + 2) / 6; break;
+            case b: h = ((r - g) / d + 4) / 6; break;
+          }
+        }
+
+        return {
+          h: Math.round(h * 360),
+          s: Math.round(s * 100),
+          l: Math.round(l * 100),
+        };
+      }
+
+      function hslToRgb(h, s, l) {
+        h /= 360;
+        s /= 100;
+        l /= 100;
+
+        if (s === 0) {
+          var gray = Math.round(l * 255);
+          return { r: gray, g: gray, b: gray };
+        }
+
+        function hue2rgb(p, q, t) {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1 / 6) return p + (q - p) * 6 * t;
+          if (t < 1 / 2) return q;
+          if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+          return p;
+        }
+
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+
+        return {
+          r: Math.round(hue2rgb(p, q, h + 1 / 3) * 255),
+          g: Math.round(hue2rgb(p, q, h) * 255),
+          b: Math.round(hue2rgb(p, q, h - 1 / 3) * 255),
+        };
+      }
+
+      function parseRgb(str) {
+        var match = str.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+        if (!match) return null;
+        var r = parseInt(match[1], 10);
+        var g = parseInt(match[2], 10);
+        var b = parseInt(match[3], 10);
+        if ([r, g, b].some(function (v) { return isNaN(v) || v < 0 || v > 255; })) return null;
+        return { r: r, g: g, b: b };
+      }
+
+      function parseHsl(str) {
+        var match = str.match(/(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*%\s*,\s*(\d+(?:\.\d+)?)\s*%/);
+        if (!match) return null;
+        var h = parseFloat(match[1]);
+        var s = parseFloat(match[2]);
+        var l = parseFloat(match[3]);
+        if (isNaN(h) || isNaN(s) || isNaN(l)) return null;
+        return { h: h % 360, s: clamp(s, 0, 100), l: clamp(l, 0, 100) };
+      }
+
+      function updateFromRgb(r, g, b) {
+        updating = true;
+        var hex = rgbToHex(r, g, b);
+        var hsl = rgbToHsl(r, g, b);
+
+        pickerInput.value = hex;
+        hexInput.value = hex;
+        rgbInput.value = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        hslInput.value = 'hsl(' + hsl.h + ', ' + hsl.s + '%, ' + hsl.l + '%)';
+        preview.style.background = hex;
+        updating = false;
+      }
+
+      pickerInput.addEventListener('input', function () {
+        if (updating) return;
+        var rgb = hexToRgb(pickerInput.value);
+        if (rgb) updateFromRgb(rgb.r, rgb.g, rgb.b);
+      });
+
+      hexInput.addEventListener('input', function () {
+        if (updating) return;
+        var val = hexInput.value.trim();
+        if (!val.startsWith('#')) val = '#' + val;
+        var rgb = hexToRgb(val);
+        if (rgb) updateFromRgb(rgb.r, rgb.g, rgb.b);
+      });
+
+      rgbInput.addEventListener('input', function () {
+        if (updating) return;
+        var rgb = parseRgb(rgbInput.value);
+        if (rgb) updateFromRgb(rgb.r, rgb.g, rgb.b);
+      });
+
+      hslInput.addEventListener('input', function () {
+        if (updating) return;
+        var hsl = parseHsl(hslInput.value);
+        if (hsl) {
+          var rgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+          updateFromRgb(rgb.r, rgb.g, rgb.b);
+        }
+      });
+
+      document.querySelectorAll('[data-copy]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var type = btn.getAttribute('data-copy');
+          var text = '';
+          if (type === 'hex') text = hexInput.value;
+          else if (type === 'rgb') text = rgbInput.value;
+          else if (type === 'hsl') text = hslInput.value;
+          if (text) copyText(text);
+        });
+      });
+
+      var initial = hexToRgb(pickerInput.value);
+      if (initial) updateFromRgb(initial.r, initial.g, initial.b);
+    })();
+  </script>
+</ToolLayout>

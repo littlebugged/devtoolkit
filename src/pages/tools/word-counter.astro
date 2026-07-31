@@ -1,0 +1,126 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('word-counter')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-io tool-io-single">
+    <div class="io-panel">
+      <label for="wc-input">Your Text</label>
+      <textarea id="wc-input" placeholder="Type or paste your text here…" spellcheck="false" style="min-height: 240px;"></textarea>
+    </div>
+  </div>
+
+  <div class="stats-grid" style="margin-top: 1rem;">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-words">0</div>
+      <div class="stat-label">Words</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-chars">0</div>
+      <div class="stat-label">Characters</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-chars-no-spaces">0</div>
+      <div class="stat-label">Characters (no spaces)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-sentences">0</div>
+      <div class="stat-label">Sentences</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-paragraphs">0</div>
+      <div class="stat-label">Paragraphs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-reading-time">0 min</div>
+      <div class="stat-label">Reading Time</div>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Type or paste your text into the textarea above. Statistics update automatically as you edit —
+      no button click required. Use this tool to check essay length, tweet character limits, blog post
+      word counts, or estimated reading time.
+    </p>
+    <h3>What Gets Counted?</h3>
+    <p>
+      <strong>Words</strong> are sequences of characters separated by whitespace.
+      <strong>Characters</strong> include every letter, number, symbol, and space.
+      <strong>Characters (no spaces)</strong> excludes whitespace.
+      <strong>Sentences</strong> are split on sentence-ending punctuation (<code>.</code>, <code>!</code>, <code>?</code>).
+      <strong>Paragraphs</strong> are non-empty blocks separated by blank lines.
+    </p>
+    <h3>Reading Time</h3>
+    <p>
+      Reading time is estimated at an average speed of 200 words per minute — a common benchmark for
+      adult silent reading. Actual reading speed varies by content complexity and reader proficiency.
+    </p>
+    <h3>Privacy</h3>
+    <p>
+      Your text is processed entirely in your browser and is never uploaded to any server.
+    </p>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var input = document.getElementById('wc-input');
+      var statWords = document.getElementById('stat-words');
+      var statChars = document.getElementById('stat-chars');
+      var statCharsNoSpaces = document.getElementById('stat-chars-no-spaces');
+      var statSentences = document.getElementById('stat-sentences');
+      var statParagraphs = document.getElementById('stat-paragraphs');
+      var statReadingTime = document.getElementById('stat-reading-time');
+
+      function countWords(text) {
+        var trimmed = text.trim();
+        if (!trimmed) return 0;
+        return trimmed.split(/\s+/).length;
+      }
+
+      function countSentences(text) {
+        var trimmed = text.trim();
+        if (!trimmed) return 0;
+        var matches = trimmed.match(/[^.!?]+[.!?]+|[^.!?]+$/g);
+        return matches ? matches.filter(function (s) { return s.trim().length > 0; }).length : 0;
+      }
+
+      function countParagraphs(text) {
+        var trimmed = text.trim();
+        if (!trimmed) return 0;
+        return trimmed.split(/\n\s*\n/).filter(function (p) { return p.trim().length > 0; }).length;
+      }
+
+      function formatReadingTime(words) {
+        if (words === 0) return '0 min';
+        var minutes = words / 200;
+        if (minutes < 1) {
+          var seconds = Math.ceil(minutes * 60);
+          return seconds + ' sec';
+        }
+        if (minutes < 10) {
+          return minutes.toFixed(1) + ' min';
+        }
+        return Math.ceil(minutes) + ' min';
+      }
+
+      function updateStats() {
+        var text = input.value;
+        var words = countWords(text);
+        statWords.textContent = words;
+        statChars.textContent = text.length;
+        statCharsNoSpaces.textContent = text.replace(/\s/g, '').length;
+        statSentences.textContent = countSentences(text);
+        statParagraphs.textContent = countParagraphs(text);
+        statReadingTime.textContent = formatReadingTime(words);
+      }
+
+      input.addEventListener('input', updateStats);
+      updateStats();
+    })();
+  </script>
+</ToolLayout>

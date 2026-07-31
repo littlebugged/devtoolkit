@@ -1,0 +1,131 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('case-converter')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <button type="button" class="btn btn-sm" data-case="upper">UPPERCASE</button>
+    <button type="button" class="btn btn-sm" data-case="lower">lowercase</button>
+    <button type="button" class="btn btn-sm" data-case="title">Title Case</button>
+    <button type="button" class="btn btn-sm" data-case="camel">camelCase</button>
+    <button type="button" class="btn btn-sm" data-case="snake">snake_case</button>
+    <button type="button" class="btn btn-sm" data-case="kebab">kebab-case</button>
+    <button type="button" class="btn btn-sm" data-case="pascal">PascalCase</button>
+    <button type="button" class="btn btn-sm" data-case="constant">CONSTANT_CASE</button>
+    <button type="button" class="btn" id="btn-copy">Copy</button>
+  </div>
+
+  <div class="tool-io">
+    <div class="io-panel">
+      <label for="case-input">Input</label>
+      <textarea id="case-input" placeholder="Enter text to convert…" spellcheck="false"></textarea>
+    </div>
+    <div class="io-panel">
+      <label for="case-output">Output</label>
+      <textarea id="case-output" readonly placeholder="Converted text will appear here…" spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Paste or type text in the input panel, then click any case style button to convert it instantly.
+      The result appears in the output panel. Use <strong>Copy</strong> to copy the converted text to
+      your clipboard.
+    </p>
+    <h3>Supported Case Styles</h3>
+    <p>
+      <strong>UPPERCASE</strong> and <strong>lowercase</strong> convert all letters.
+      <strong>Title Case</strong> capitalizes the first letter of each word.
+      <strong>camelCase</strong> and <strong>PascalCase</strong> join words without spaces — camelCase
+      starts lowercase, PascalCase starts uppercase.
+      <strong>snake_case</strong> and <strong>CONSTANT_CASE</strong> use underscores;
+      <strong>kebab-case</strong> uses hyphens.
+    </p>
+    <h3>Common Use Cases</h3>
+    <p>
+      Convert variable names between programming conventions, normalize database column names, format
+      CSS class names, or quickly change text casing for headings and titles. The tool splits on
+      spaces, underscores, hyphens, and camelCase boundaries automatically.
+    </p>
+    <h3>Privacy</h3>
+    <p>
+      All conversions happen locally in your browser. Your text is never sent to a server.
+    </p>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var input = document.getElementById('case-input');
+      var output = document.getElementById('case-output');
+
+      function splitWords(text) {
+        return text
+          .replace(/([a-z])([A-Z])/g, '$1 $2')
+          .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+          .split(/[\s_\-]+/)
+          .filter(function (w) { return w.length > 0; })
+          .map(function (w) { return w.toLowerCase(); });
+      }
+
+      function toTitleCase(words) {
+        return words.map(function (w) {
+          return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+      }
+
+      function toCamelCase(words, pascal) {
+        if (!words.length) return '';
+        return words.map(function (w, i) {
+          if (i === 0 && !pascal) return w;
+          return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join('');
+      }
+
+      function convert(text, type) {
+        if (!text) return '';
+
+        switch (type) {
+          case 'upper':
+            return text.toUpperCase();
+          case 'lower':
+            return text.toLowerCase();
+          case 'title': {
+            var titleWords = splitWords(text);
+            return toTitleCase(titleWords);
+          }
+          case 'camel':
+            return toCamelCase(splitWords(text), false);
+          case 'pascal':
+            return toCamelCase(splitWords(text), true);
+          case 'snake':
+            return splitWords(text).join('_');
+          case 'kebab':
+            return splitWords(text).join('-');
+          case 'constant':
+            return splitWords(text).join('_').toUpperCase();
+          default:
+            return text;
+        }
+      }
+
+      document.querySelectorAll('[data-case]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var type = btn.getAttribute('data-case');
+          output.value = convert(input.value, type);
+        });
+      });
+
+      document.getElementById('btn-copy').addEventListener('click', function () {
+        if (!output.value) {
+          showToast('Nothing to copy');
+          return;
+        }
+        copyText(output.value);
+      });
+    })();
+  </script>
+</ToolLayout>

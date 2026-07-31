@@ -1,0 +1,88 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { Tool } from '../data/tools';
+import { tools } from '../data/tools';
+
+interface Props {
+  tool: Tool;
+}
+
+const { tool } = Astro.props;
+
+const relatedTools = tools
+  .filter(t => t.category === tool.category && t.slug !== tool.slug)
+  .slice(0, 3);
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: tool.name,
+  description: tool.metaDescription,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+};
+---
+
+<BaseLayout
+  title={tool.name}
+  description={tool.metaDescription}
+  keywords={tool.keywords}
+>
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+  <div class="tool-page">
+    <nav class="breadcrumb">
+      <a href="/">Home</a>
+      <span>›</span>
+      <span>{tool.name}</span>
+    </nav>
+
+    <!-- Top Ad -->
+    <div class="ad-container ad-top" id="ad-top">
+      <span class="ad-label">Advertisement</span>
+    </div>
+
+    <div class="tool-header">
+      <h1>{tool.name}</h1>
+      <p>{tool.description}</p>
+    </div>
+
+    <div class="tool-workspace">
+      <slot />
+    </div>
+
+    <!-- Middle Ad (between tool and info) -->
+    <div class="ad-container ad-middle" id="ad-middle">
+      <span class="ad-label">Advertisement</span>
+    </div>
+
+    <!-- SEO Content -->
+    <slot name="info" />
+
+    <!-- Bottom Ad -->
+    <div class="ad-container ad-bottom" id="ad-bottom">
+      <span class="ad-label">Advertisement</span>
+    </div>
+
+    {relatedTools.length > 0 && (
+      <div class="related-tools">
+        <h2>Related Tools</h2>
+        <div class="tools-grid">
+          {relatedTools.map(rt => (
+            <a href={`/tools/${rt.slug}`} class="tool-card">
+              <div class="tool-card-icon">{rt.icon}</div>
+              <h3>{rt.name}</h3>
+              <p>{rt.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</BaseLayout>

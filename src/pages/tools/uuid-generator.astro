@@ -1,0 +1,101 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('uuid-generator')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <label for="uuid-count" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--color-text-muted);">
+      Count
+      <input type="number" id="uuid-count" min="1" max="100" value="5" style="width: 5rem;" />
+    </label>
+    <button type="button" class="btn btn-primary" id="btn-generate">Generate</button>
+    <button type="button" class="btn" id="btn-copy-all">Copy All</button>
+    <button type="button" class="btn" id="btn-clear">Clear</button>
+  </div>
+
+  <div id="uuid-list" class="uuid-list" aria-live="polite"></div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Set the number of UUIDs to generate (1–100), then click <strong>Generate</strong>. Click any UUID to
+      copy it to your clipboard, or use <strong>Copy All</strong> to copy the entire list at once.
+    </p>
+    <h3>What is a UUID?</h3>
+    <p>
+      A UUID (Universally Unique Identifier) is a 128-bit identifier formatted as
+      <code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>. UUID version 4 (v4) identifiers are generated from
+      random or pseudo-random numbers, making collisions statistically negligible for practical purposes.
+    </p>
+    <h3>When to Use UUIDs</h3>
+    <p>
+      UUIDs are ideal for database primary keys, session tokens, request correlation IDs, and anywhere you need
+      a unique identifier without a central authority. This generator uses the browser's
+      <code>crypto.randomUUID()</code> API for cryptographically secure random values.
+    </p>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var countInput = document.getElementById('uuid-count');
+      var listEl = document.getElementById('uuid-list');
+      var uuids = [];
+
+      function clampCount() {
+        var n = parseInt(countInput.value, 10);
+        if (isNaN(n) || n < 1) n = 1;
+        if (n > 100) n = 100;
+        countInput.value = n;
+        return n;
+      }
+
+      function render() {
+        listEl.innerHTML = '';
+        uuids.forEach(function (uuid) {
+          var item = document.createElement('div');
+          item.className = 'uuid-item';
+
+          var box = document.createElement('div');
+          box.className = 'result-box';
+          box.textContent = uuid;
+          box.title = 'Click to copy';
+          box.addEventListener('click', function () {
+            copyText(uuid);
+          });
+
+          item.appendChild(box);
+          listEl.appendChild(item);
+        });
+      }
+
+      function generate() {
+        var count = clampCount();
+        uuids = [];
+        for (var i = 0; i < count; i++) {
+          uuids.push(crypto.randomUUID());
+        }
+        render();
+      }
+
+      document.getElementById('btn-generate').addEventListener('click', generate);
+
+      document.getElementById('btn-copy-all').addEventListener('click', function () {
+        if (uuids.length === 0) {
+          showToast('Nothing to copy');
+          return;
+        }
+        copyText(uuids.join('\n'));
+      });
+
+      document.getElementById('btn-clear').addEventListener('click', function () {
+        uuids = [];
+        listEl.innerHTML = '';
+      });
+
+      generate();
+    })();
+  </script>
+</ToolLayout>

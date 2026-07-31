@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { categories, tools, getToolsByCategory } from '../data/tools';
+---
+
+<BaseLayout
+  title="Home"
+  description="Free online developer tools — JSON formatter, Base64 encoder, UUID generator, hash generator, and more. All tools run locally in your browser. No signup, no data collection."
+  keywords={['online tools', 'developer tools', 'web tools', 'free tools', 'json formatter', 'base64', 'uuid generator']}
+>
+  <div class="hero">
+    <h1>Free Online Developer Tools</h1>
+    <p>Fast, private, and free. All tools run entirely in your browser — no data is ever sent to a server.</p>
+  </div>
+
+  <!-- Top Ad -->
+  <div class="ad-container ad-top" id="ad-home-top">
+    <span class="ad-label">Advertisement</span>
+  </div>
+
+  {categories.map(cat => {
+    const catTools = getToolsByCategory(cat.id);
+    if (catTools.length === 0) return null;
+    return (
+      <section class="category-section">
+        <h2 class="category-title">
+          <span>{cat.icon}</span>
+          {cat.name}
+        </h2>
+        <div class="tools-grid">
+          {catTools.map(tool => (
+            <a href={`/tools/${tool.slug}`} class="tool-card">
+              <div class="tool-card-icon">{tool.icon}</div>
+              <h3>{tool.name}</h3>
+              <p>{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+
+  <!-- Bottom Ad -->
+  <div class="ad-container ad-bottom" id="ad-home-bottom">
+    <span class="ad-label">Advertisement</span>
+  </div>
+
+  <!-- SEO content block -->
+  <div class="tool-info" style="margin-top: 2rem;">
+    <h2>Why Use DevToolKit?</h2>
+    <p>DevToolKit provides a collection of free, fast, and privacy-focused online tools for developers, designers, and everyday users. Every tool runs 100% in your browser — your data never leaves your device.</p>
+    <h3>Key Features</h3>
+    <ul>
+      <li><strong>100% Client-Side</strong> — All processing happens in your browser. No server, no data collection.</li>
+      <li><strong>No Signup Required</strong> — Use any tool instantly, no account needed.</li>
+      <li><strong>Fast &amp; Lightweight</strong> — Optimized for speed with minimal page load times.</li>
+      <li><strong>Mobile Friendly</strong> — Works perfectly on phones, tablets, and desktops.</li>
+      <li><strong>Free Forever</strong> — All tools are completely free to use.</li>
+    </ul>
+  </div>
+</BaseLayout>

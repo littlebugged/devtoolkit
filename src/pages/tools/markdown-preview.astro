@@ -1,0 +1,198 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('markdown-preview')!;
+
+const sampleMarkdown = `# Markdown Preview
+
+Write **Markdown** on the left and see the rendered preview on the right.
+
+## Features
+
+- Headings (H1–H3)
+- **Bold** and *italic* text
+- \`inline code\` and code blocks
+- [Links](https://example.com)
+- Blockquotes and horizontal rules
+
+> This is a blockquote. Great for callouts and notes.
+
+---
+
+\`\`\`
+function hello() {
+  console.log("Hello, world!");
+}
+\`\`\`
+
+![Placeholder image](https://via.placeholder.com/150)
+
+1. Ordered lists
+2. Work too
+
+Happy writing!`;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-io">
+    <div class="io-panel">
+      <label for="md-input">Markdown</label>
+      <textarea id="md-input" spellcheck="false">{sampleMarkdown}</textarea>
+    </div>
+    <div class="io-panel">
+      <label>Preview</label>
+      <div id="md-preview" class="md-preview"></div>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Type or paste Markdown in the left panel. The rendered HTML preview updates in real time on the
+      right. A sample document is pre-loaded so you can see supported syntax immediately.
+    </p>
+    <h3>Supported Markdown Syntax</h3>
+    <p>
+      This previewer supports common Markdown elements: headings (<code>#</code>, <code>##</code>,
+      <code>###</code>), <strong>bold</strong> (<code>**text**</code>), <em>italic</em>
+      (<code>*text*</code>), inline code, fenced code blocks, links, images, unordered and ordered
+      lists, blockquotes (<code>&gt;</code>), horizontal rules (<code>---</code>), and line breaks.
+    </p>
+    <h3>Limitations</h3>
+    <p>
+      This is a lightweight regex-based parser intended for quick previews — not a full CommonMark
+      implementation. Complex nested structures, tables, and edge cases may not render exactly as they
+      would in a production Markdown engine.
+    </p>
+    <h3>Privacy</h3>
+    <p>
+      Your Markdown is processed entirely in your browser. Nothing is uploaded to any server.
+    </p>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var input = document.getElementById('md-input');
+      var preview = document.getElementById('md-preview');
+
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function parseMarkdown(md) {
+        var html = md;
+
+        // Code blocks (fenced)
+        var codeBlocks = [];
+        html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, function (_, lang, code) {
+          var idx = codeBlocks.length;
+          codeBlocks.push('<pre><code>' + escapeHtml(code.trim()) + '</code></pre>');
+          return '\x00CODEBLOCK' + idx + '\x00';
+        });
+
+        // Horizontal rules
+        html = html.replace(/^(\*{3,}|-{3,}|_{3,})$/gm, '<hr>');
+
+        // Headings
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+        // Blockquotes
+        html = html.replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>');
+        html = html.replace(/<\/blockquote>\n<blockquote>/g, '\n');
+
+        // Images
+        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+
+        // Links
+        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+        // Bold and italic
+        html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        html = html.replace(/___(.+?)___/g, '<strong><em>$1</em></strong>');
+        html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+        html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+        // Inline code
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+        // Unordered lists
+        html = html.replace(/((?:^[\-\*\+] .+\n?)+)/gm, function (block) {
+          var items = block.trim().split('\n').map(function (line) {
+            return '<li>' + line.replace(/^[\-\*\+] /, '') + '</li>';
+          }).join('');
+          return '<ul>' + items + '</ul>';
+        });
+
+        // Ordered lists
+        html = html.replace(/((?:^\d+\. .+\n?)+)/gm, function (block) {
+          var items = block.trim().split('\n').map(function (line) {
+            return '<li>' + line.replace(/^\d+\. /, '') + '</li>';
+          }).join('');
+          return '<ol>' + items + '</ol>';
+        });
+
+        // Paragraphs and line breaks
+        var lines = html.split('\n');
+        var result = [];
+        var inBlock = false;
+
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          var trimmed = line.trim();
+
+          if (!trimmed) {
+            if (inBlock) {
+              result.push('</p>');
+              inBlock = false;
+            }
+            continue;
+          }
+
+          if (/^<(h[1-6]|ul|ol|li|blockquote|pre|hr|img)/.test(trimmed) || trimmed.indexOf('\x00CODEBLOCK') !== -1) {
+            if (inBlock) {
+              result.push('</p>');
+              inBlock = false;
+            }
+            result.push(line);
+            continue;
+          }
+
+          if (!inBlock) {
+            result.push('<p>');
+            inBlock = true;
+            result.push(trimmed);
+          } else {
+            result.push('<br>' + trimmed);
+          }
+        }
+
+        if (inBlock) result.push('</p>');
+
+        html = result.join('\n');
+
+        // Restore code blocks
+        codeBlocks.forEach(function (block, idx) {
+          html = html.replace('\x00CODEBLOCK' + idx + '\x00', block);
+        });
+
+        return html;
+      }
+
+      function render() {
+        preview.innerHTML = parseMarkdown(input.value);
+      }
+
+      input.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</ToolLayout>

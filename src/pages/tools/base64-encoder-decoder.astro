@@ -1,0 +1,137 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('base64-encoder-decoder')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <button type="button" class="btn btn-primary" id="btn-encode">Encode</button>
+    <button type="button" class="btn" id="btn-decode">Decode</button>
+    <button type="button" class="btn" id="btn-copy">Copy</button>
+    <button type="button" class="btn" id="btn-clear">Clear</button>
+  </div>
+
+  <div id="b64-status" class="b64-status" aria-live="polite"></div>
+
+  <div class="tool-io">
+    <div class="io-panel">
+      <label for="b64-input">Input</label>
+      <textarea id="b64-input" placeholder="Enter plain text or Base64 string…" spellcheck="false"></textarea>
+    </div>
+    <div class="io-panel">
+      <label for="b64-output">Output</label>
+      <textarea id="b64-output" placeholder="Result will appear here…" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Enter plain text and click <strong>Encode</strong> to convert it to Base64, or paste a Base64 string and
+      click <strong>Decode</strong> to recover the original text. This tool fully supports UTF-8 characters
+      including emoji and non-Latin scripts.
+    </p>
+    <h3>What is Base64 Encoding?</h3>
+    <p>
+      Base64 is a binary-to-text encoding scheme that represents binary data using 64 printable ASCII characters
+      (A–Z, a–z, 0–9, +, /). It is commonly used to embed images in HTML/CSS, transmit binary data over
+      text-based protocols like email and JSON, and store credentials in HTTP Basic Auth headers.
+    </p>
+    <h3>UTF-8 Support</h3>
+    <p>
+      Standard <code>btoa()</code> only handles Latin-1 characters. This tool uses
+      <code>TextEncoder</code> and <code>TextDecoder</code> to correctly encode and decode Unicode text,
+      ensuring Chinese, Japanese, emoji, and other multi-byte characters work without corruption.
+    </p>
+  </div>
+
+  <style>
+    .b64-status {
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      min-height: 1.25rem;
+      color: var(--color-error);
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      var input = document.getElementById('b64-input');
+      var output = document.getElementById('b64-output');
+      var status = document.getElementById('b64-status');
+
+      function encodeUtf8(str) {
+        var bytes = new TextEncoder().encode(str);
+        var binary = '';
+        for (var i = 0; i < bytes.length; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+      }
+
+      function decodeUtf8(str) {
+        var binary = atob(str.trim());
+        var bytes = new Uint8Array(binary.length);
+        for (var i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return new TextDecoder().decode(bytes);
+      }
+
+      function showError(msg) {
+        status.textContent = msg;
+      }
+
+      function clearError() {
+        status.textContent = '';
+      }
+
+      document.getElementById('btn-encode').addEventListener('click', function () {
+        clearError();
+        var text = input.value;
+        if (!text) {
+          showToast('Input is empty');
+          return;
+        }
+        try {
+          output.value = encodeUtf8(text);
+        } catch (e) {
+          showError('Encode failed: ' + e.message);
+        }
+      });
+
+      document.getElementById('btn-decode').addEventListener('click', function () {
+        clearError();
+        var text = input.value.trim();
+        if (!text) {
+          showToast('Input is empty');
+          return;
+        }
+        try {
+          output.value = decodeUtf8(text);
+        } catch (e) {
+          showError('Invalid Base64: ' + e.message);
+          output.value = '';
+        }
+      });
+
+      document.getElementById('btn-copy').addEventListener('click', function () {
+        var text = output.value;
+        if (!text) {
+          showToast('Nothing to copy');
+          return;
+        }
+        copyText(text);
+      });
+
+      document.getElementById('btn-clear').addEventListener('click', function () {
+        input.value = '';
+        output.value = '';
+        clearError();
+      });
+    })();
+  </script>
+</ToolLayout>

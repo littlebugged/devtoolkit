@@ -1,0 +1,104 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  keywords?: string[];
+  canonical?: string;
+  ogImage?: string;
+}
+
+const { title, description, keywords = [], canonical, ogImage } = Astro.props;
+const siteName = 'DevToolKit';
+const fullTitle = title === 'Home' ? `${siteName} - Free Online Developer Tools` : `${title} - ${siteName}`;
+const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href={canonicalUrl} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:site_name" content={siteName} />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+
+  <title>{fullTitle}</title>
+
+  <!-- Preconnect to ad network -->
+  <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!--
+    Adsterra Ad Script
+    Replace YOUR_ADSTERRA_ID with your actual Adsterra publisher ID after signing up at https://publishers.adsterra.com
+  -->
+  <!-- <script async src="//www.highperformanceformat.com/YOUR_ADSTERRA_ID/invoke.js"></script> -->
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <span class="logo-icon">⚡</span>
+        {siteName}
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/">Tools</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <slot />
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>&copy; {new Date().getFullYear()} {siteName}. All tools run in your browser — no data is sent to any server.</p>
+      <ul class="footer-links">
+        <li><a href="/">All Tools</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Copy Toast notification -->
+  <div id="copy-toast" class="copy-toast">Copied!</div>
+
+  <script is:inline>
+    function showToast(msg) {
+      const t = document.getElementById('copy-toast');
+      t.textContent = msg || 'Copied!';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1500);
+    }
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => showToast());
+    }
+  </script>
+</body>
+</html>

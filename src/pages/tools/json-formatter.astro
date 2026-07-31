@@ -1,0 +1,162 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('json-formatter')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <button type="button" class="btn btn-primary" id="btn-format">Format</button>
+    <button type="button" class="btn" id="btn-minify">Minify</button>
+    <button type="button" class="btn" id="btn-validate">Validate</button>
+    <button type="button" class="btn" id="btn-copy">Copy</button>
+    <button type="button" class="btn" id="btn-clear">Clear</button>
+  </div>
+
+  <div id="json-status" class="json-status" aria-live="polite"></div>
+
+  <div class="tool-io">
+    <div class="io-panel">
+      <label for="json-input">Input</label>
+      <textarea id="json-input" placeholder='{"name": "example", "items": [1, 2, 3]}' spellcheck="false"></textarea>
+    </div>
+    <div class="io-panel">
+      <label for="json-output">Output</label>
+      <textarea id="json-output" placeholder="Formatted JSON will appear here…" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div slot="info" class="tool-info">
+    <h2>How to Use</h2>
+    <p>
+      Paste your JSON into the input panel on the left. Click <strong>Format</strong> to beautify it with
+      readable indentation, or <strong>Minify</strong> to compress it into a single line. Use
+      <strong>Validate</strong> to check whether your JSON is syntactically correct. The tool auto-detects
+      validity as you type and highlights any syntax errors.
+    </p>
+    <h3>What is JSON Formatting?</h3>
+    <p>
+      JSON (JavaScript Object Notation) is a lightweight data-interchange format used in APIs, config files,
+      and databases. Formatting JSON adds consistent indentation and line breaks so humans can read and debug
+      it easily. Minifying removes all unnecessary whitespace to reduce file size for transmission.
+    </p>
+    <h3>Why Validate JSON?</h3>
+    <p>
+      A single missing comma, unquoted key, or trailing comma can break JSON parsing in your application.
+      Validating before deployment catches these errors early. This tool runs entirely in your browser — your
+      data never leaves your device.
+    </p>
+  </div>
+
+  <style>
+    .json-status {
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      min-height: 1.25rem;
+    }
+    .json-status.valid {
+      color: var(--color-success);
+    }
+    .json-status.invalid {
+      color: var(--color-error);
+    }
+    textarea.json-valid {
+      border-color: var(--color-success);
+    }
+    textarea.json-invalid {
+      border-color: var(--color-error);
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      var input = document.getElementById('json-input');
+      var output = document.getElementById('json-output');
+      var status = document.getElementById('json-status');
+
+      function parseInput() {
+        var text = input.value.trim();
+        if (!text) return { ok: true, empty: true };
+        try {
+          return { ok: true, data: JSON.parse(text) };
+        } catch (e) {
+          return { ok: false, error: e.message };
+        }
+      }
+
+      function setStatus(result) {
+        input.classList.remove('json-valid', 'json-invalid');
+        if (result.empty) {
+          status.textContent = '';
+          status.className = 'json-status';
+          return;
+        }
+        if (result.ok) {
+          status.textContent = '✓ Valid JSON';
+          status.className = 'json-status valid';
+          input.classList.add('json-valid');
+        } else {
+          status.textContent = '✗ Invalid JSON: ' + result.error;
+          status.className = 'json-status invalid';
+          input.classList.add('json-invalid');
+        }
+      }
+
+      function formatJson(spaces) {
+        var result = parseInput();
+        if (result.empty) {
+          showToast('Input is empty');
+          return;
+        }
+        if (!result.ok) {
+          setStatus(result);
+          showToast('Fix JSON errors first');
+          return;
+        }
+        output.value = JSON.stringify(result.data, null, spaces);
+        setStatus(result);
+      }
+
+      input.addEventListener('input', function () {
+        setStatus(parseInput());
+      });
+
+      document.getElementById('btn-format').addEventListener('click', function () {
+        formatJson(2);
+      });
+
+      document.getElementById('btn-minify').addEventListener('click', function () {
+        formatJson(0);
+      });
+
+      document.getElementById('btn-validate').addEventListener('click', function () {
+        var result = parseInput();
+        setStatus(result);
+        if (result.empty) {
+          showToast('Input is empty');
+        } else if (result.ok) {
+          showToast('Valid JSON');
+        } else {
+          showToast('Invalid JSON');
+        }
+      });
+
+      document.getElementById('btn-copy').addEventListener('click', function () {
+        var text = output.value || input.value;
+        if (!text) {
+          showToast('Nothing to copy');
+          return;
+        }
+        copyText(text);
+      });
+
+      document.getElementById('btn-clear').addEventListener('click', function () {
+        input.value = '';
+        output.value = '';
+        setStatus({ ok: true, empty: true });
+      });
+    })();
+  </script>
+</ToolLayout>
