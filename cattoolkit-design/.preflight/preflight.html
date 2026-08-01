@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>喵爪工具箱</title>
+    <style id="theme-vars">
+/* CatToolKit — Cat-themed developer tools design tokens */
+
+:root {
+  /* Brand: warm tangerine + cream */
+  --cat-hue: 28;
+  --cat-sat: 90%;
+  --cat-lit: 60%;
+
+  --cat-primary: hsl(var(--cat-hue) var(--cat-sat) var(--cat-lit));
+  --cat-primary-hover: hsl(var(--cat-hue) var(--cat-sat) calc(var(--cat-lit) - 6%));
+  --cat-primary-soft: hsl(var(--cat-hue) var(--cat-sat) var(--cat-lit) / 0.12);
+  --cat-primary-glow: hsl(var(--cat-hue) var(--cat-sat) var(--cat-lit) / 0.22);
+
+  /* Surfaces */
+  --cat-background: #fffbf5;
+  --cat-foreground: #3d2c2e;
+  --cat-card: #ffffff;
+  --cat-card-foreground: #3d2c2e;
+  --cat-popover: #ffffff;
+  --cat-popover-foreground: #3d2c2e;
+  --cat-muted: #f5efe7;
+  --cat-muted-foreground: #7a6862;
+  --cat-input: #ffffff;
+  --cat-border: #eaddcf;
+  --cat-ring: hsl(var(--cat-hue) var(--cat-sat) var(--cat-lit));
+
+  /* Secondary cat accents */
+  --cat-paw: #f4acb7;
+  --cat-paw-soft: #f4acb740;
+  --cat-cream: #fdf2dc;
+  --cat-whisker: #c4b5a5;
+
+  /* State colors */
+  --cat-state-success: #2a9d8f;
+  --cat-state-warning: #e9c46a;
+  --cat-state-error: #e76f51;
+  --cat-state-info: #4a90e2;
+
+  /* Typography */
+  --cat-font-sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --cat-font-display: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --cat-font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* Radius */
+  --cat-radius-sm: 6px;
+  --cat-radius-md: 14px;
+  --cat-radius-lg: 24px;
+  --cat-radius-pill: 999px;
+
+  /* Shadows */
+  --cat-shadow-1: 0 1px 2px rgba(61, 44, 46, 0.05), 0 1px 1px rgba(61, 44, 46, 0.03);
+  --cat-shadow-2: 0 8px 24px -8px rgba(61, 44, 46, 0.12);
+  --cat-shadow-3: 0 24px 60px -20px rgba(61, 44, 46, 0.18);
+
+  /* Layout */
+  --cat-header-height: 72px;
+  --cat-max-width: 1200px;
+}
+
+html.dark {
+  --cat-background: #1f1816;
+  --cat-foreground: #f7f1ea;
+  --cat-card: #2a211f;
+  --cat-card-foreground: #f7f1ea;
+  --cat-popover: #2a211f;
+  --cat-popover-foreground: #f7f1ea;
+  --cat-muted: #342a27;
+  --cat-muted-foreground: #a99b8f;
+  --cat-input: #342a27;
+  --cat-border: #4a3f3a;
+  --cat-cream: #2f2622;
+  --cat-whisker: #6b5e56;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--cat-background);
+    --color-foreground: var(--cat-foreground);
+    --color-card: var(--cat-card);
+    --color-card-foreground: var(--cat-card-foreground);
+    --color-popover: var(--cat-popover);
+    --color-popover-foreground: var(--cat-popover-foreground);
+    --color-primary: var(--cat-primary);
+    --color-muted: var(--cat-muted);
+    --color-muted-foreground: var(--cat-muted-foreground);
+    --color-border: var(--cat-border);
+    --color-input: var(--cat-input);
+    --color-ring: var(--cat-ring);
+    --radius-sm: var(--cat-radius-sm);
+    --radius-md: var(--cat-radius-md);
+    --radius-lg: var(--cat-radius-lg);
+  }
+  @layer base {
+    body { background: var(--cat-background); color: var(--cat-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--cat-background); }
+      .text-background { color: var(--cat-background); }
+      .border-background { border-color: var(--cat-background); }
+      .ring-background { --tw-ring-color: var(--cat-background); }
+      .bg-foreground { background-color: var(--cat-foreground); }
+      .text-foreground { color: var(--cat-foreground); }
+      .border-foreground { border-color: var(--cat-foreground); }
+      .ring-foreground { --tw-ring-color: var(--cat-foreground); }
+      .bg-card { background-color: var(--cat-card); }
+      .text-card { color: var(--cat-card); }
+      .border-card { border-color: var(--cat-card); }
+      .ring-card { --tw-ring-color: var(--cat-card); }
+      .bg-card-foreground { background-color: var(--cat-card-foreground); }
+      .text-card-foreground { color: var(--cat-card-foreground); }
+      .border-card-foreground { border-color: var(--cat-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--cat-card-foreground); }
+      .bg-popover { background-color: var(--cat-popover); }
+      .text-popover { color: var(--cat-popover); }
+      .border-popover { border-color: var(--cat-popover); }
+      .ring-popover { --tw-ring-color: var(--cat-popover); }
+      .bg-popover-foreground { background-color: var(--cat-popover-foreground); }
+      .text-popover-foreground { color: var(--cat-popover-foreground); }
+      .border-popover-foreground { border-color: var(--cat-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--cat-popover-foreground); }
+      .bg-primary { background-color: var(--cat-primary); }
+      .text-primary { color: var(--cat-primary); }
+      .border-primary { border-color: var(--cat-primary); }
+      .ring-primary { --tw-ring-color: var(--cat-primary); }
+      .bg-muted { background-color: var(--cat-muted); }
+      .text-muted { color: var(--cat-muted); }
+      .border-muted { border-color: var(--cat-muted); }
+      .ring-muted { --tw-ring-color: var(--cat-muted); }
+      .bg-muted-foreground { background-color: var(--cat-muted-foreground); }
+      .text-muted-foreground { color: var(--cat-muted-foreground); }
+      .border-muted-foreground { border-color: var(--cat-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--cat-muted-foreground); }
+      .bg-border { background-color: var(--cat-border); }
+      .text-border { color: var(--cat-border); }
+      .border-border { border-color: var(--cat-border); }
+      .ring-border { --tw-ring-color: var(--cat-border); }
+      .bg-input { background-color: var(--cat-input); }
+      .text-input { color: var(--cat-input); }
+      .border-input { border-color: var(--cat-input); }
+      .ring-input { --tw-ring-color: var(--cat-input); }
+      .bg-ring { background-color: var(--cat-ring); }
+      .text-ring { color: var(--cat-ring); }
+      .border-ring { border-color: var(--cat-ring); }
+      .ring-ring { --tw-ring-color: var(--cat-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

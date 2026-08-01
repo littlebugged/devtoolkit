@@ -167,16 +167,5 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
 
   <CatPet />
 
-  <!-- Auto-hide empty ad containers -->
-  <script is:inline>
-    setTimeout(function() {
-      document.querySelectorAll('.ad-container').forEach(function(el) {
-        var hasAd = el.querySelector('iframe, ins, img, [id^="container-"] > *');
-        if (!hasAd || el.offsetHeight < 10) {
-          el.style.display = 'none';
-        }
-      });
-    }, 3000);
-  </script>
 </body>
 </html>

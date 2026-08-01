@@ -1,0 +1,28 @@
+{
+  "name": "CatToolKit",
+  "version": 1,
+  "description": "猫咪主题的开发者工具网站，温暖圆润的喵爪风格",
+  "data": [
+    {
+      "id": "page-index",
+      "title": "喵爪工具箱",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1785482800000,
+      "devMetadata": {
+        "htmlSrc": "pages/index.html",
+        "interactions": []
+      },
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "CatToolKit"
+  }
+}

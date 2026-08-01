@@ -1,8 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import AdBanner from '../components/AdBanner.astro';
-import AdNative from '../components/AdNative.astro';
-import AdMobile from '../components/AdMobile.astro';
 import { categories, tools, getToolsByCategory } from '../data/tools';
 import Icon from '../components/Icon.astro';
 ---
@@ -47,9 +44,6 @@ import Icon from '../components/Icon.astro';
     </span>
   </div>
 
-  <!-- Top Ad -->
-  <AdBanner id="ad-home-top" class="ad-top" />
-
   <div id="tools">
     {categories.map(cat => {
       const catTools = getToolsByCategory(cat.id);
@@ -73,10 +67,6 @@ import Icon from '../components/Icon.astro';
       );
     })}
   </div>
-
-  <!-- Bottom Ad -->
-  <AdNative id="ad-home-bottom" class="ad-bottom ad-desktop-only" />
-  <AdMobile id="ad-home-bottom-mobile" class="ad-bottom ad-mobile-only" />
 
   <!-- WebSite Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
