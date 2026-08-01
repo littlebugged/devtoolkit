@@ -1,5 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AdBanner from '../components/AdBanner.astro';
+import AdNative from '../components/AdNative.astro';
+import AdMobile from '../components/AdMobile.astro';
 import { categories, tools, getToolsByCategory } from '../data/tools';
 import Icon from '../components/Icon.astro';
 ---
@@ -44,6 +47,8 @@ import Icon from '../components/Icon.astro';
     </span>
   </div>
 
+  <AdBanner id="ad-home-top" class="ad-desktop-only" />
+
   <div id="tools">
     {categories.map(cat => {
       const catTools = getToolsByCategory(cat.id);
@@ -68,16 +73,8 @@ import Icon from '../components/Icon.astro';
     })}
   </div>
 
-  <!-- Bottom Ad (sandboxed to prevent redirects) -->
-  <div class="ad-bottom-wrapper">
-    <iframe
-      srcdoc="<script>atOptions={'key':'ce88094cd4550c185792b9388fca6963','format':'iframe','height':90,'width':728,'params':{}};</script><script src='https://www.highperformanceformat.com/ce88094cd4550c185792b9388fca6963/invoke.js'></script>"
-      sandbox="allow-scripts allow-popups"
-      style="width:728px;height:90px;border:none;margin:0 auto;display:block;"
-      loading="lazy"
-      title="Advertisement"
-    ></iframe>
-  </div>
+  <AdNative id="ad-home-bottom" class="ad-desktop-only" />
+  <AdMobile id="ad-home-bottom-mobile" class="ad-mobile-only" />
 
   <!-- WebSite Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({

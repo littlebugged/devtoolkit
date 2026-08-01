@@ -1,5 +1,8 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import AdBanner from '../components/AdBanner.astro';
+import AdNative from '../components/AdNative.astro';
+import AdMobile from '../components/AdMobile.astro';
 import type { Tool } from '../data/tools';
 import { tools } from '../data/tools';
 import Icon from '../components/Icon.astro';
@@ -82,6 +85,8 @@ const breadcrumbData = {
       <span>{tool.name}</span>
     </nav>
 
+    <AdBanner id="ad-top" class="ad-desktop-only" />
+
     <div class="tool-header">
       <h1>{tool.name}</h1>
       <p>{tool.description}</p>
@@ -91,22 +96,17 @@ const breadcrumbData = {
       <slot />
     </div>
 
+    <AdNative id="ad-middle" class="ad-desktop-only" />
+    <AdMobile id="ad-middle-mobile" class="ad-mobile-only" />
+
     <!-- SEO Content -->
     <details class="tool-info-accordion">
       <summary class="tool-info-toggle">Learn more</summary>
       <slot name="info" />
     </details>
 
-    <!-- Bottom Ad (sandboxed to prevent redirects) -->
-    <div class="ad-bottom-wrapper">
-      <iframe
-        srcdoc="<script>atOptions={'key':'ce88094cd4550c185792b9388fca6963','format':'iframe','height':90,'width':728,'params':{}};</script><script src='https://www.highperformanceformat.com/ce88094cd4550c185792b9388fca6963/invoke.js'></script>"
-        sandbox="allow-scripts allow-popups"
-        style="width:728px;height:90px;border:none;margin:0 auto;display:block;"
-        loading="lazy"
-        title="Advertisement"
-      ></iframe>
-    </div>
+    <AdBanner id="ad-bottom" class="ad-desktop-only" />
+    <AdMobile id="ad-bottom-mobile" class="ad-mobile-only" />
 
     {relatedTools.length > 0 && (
       <div class="related-tools">

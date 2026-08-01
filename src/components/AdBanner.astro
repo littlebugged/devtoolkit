@@ -7,15 +7,12 @@ interface Props {
 const { id, class: className = '' } = Astro.props;
 ---
 
-<div class={`ad-container ${className}`} id={id}>
-  <script is:inline data-cfasync="false" type='text/javascript'>
-    atOptions = {
-      'key' : 'ce88094cd4550c185792b9388fca6963',
-      'format' : 'iframe',
-      'height' : 90,
-      'width' : 728,
-      'params' : {}
-    };
-  </script>
-  <script is:inline data-cfasync="false" type='text/javascript' src="https://www.highperformanceformat.com/ce88094cd4550c185792b9388fca6963/invoke.js"></script>
+<div class={`ad-slot ad-banner ${className}`} id={id}>
+  <iframe
+    srcdoc="<body style='margin:0;overflow:hidden;display:flex;justify-content:center'><script>atOptions={'key':'ce88094cd4550c185792b9388fca6963','format':'iframe','height':90,'width':728,'params':{}};</script><script src='https://www.highperformanceformat.com/ce88094cd4550c185792b9388fca6963/invoke.js'></script></body>"
+    sandbox="allow-scripts allow-popups"
+    style="width:728px;height:90px;border:none;display:block;margin:0 auto;"
+    loading="lazy"
+    title="Advertisement"
+  ></iframe>
 </div>

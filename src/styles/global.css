@@ -687,17 +687,39 @@ textarea {
   font-size: 0.8rem;
 }
 
-/* Ad container */
-.ad-bottom-wrapper {
+/* Ad slots */
+.ad-slot {
   text-align: center;
-  margin: 2rem auto;
+  margin: 1.5rem auto;
+  overflow: hidden;
+}
+
+.ad-banner {
   max-width: 728px;
-  min-height: 90px;
+}
+
+.ad-native {
+  max-width: 100%;
+}
+
+.ad-mobile {
+  max-width: 320px;
+}
+
+.ad-desktop-only {
+  display: block;
+}
+
+.ad-mobile-only {
+  display: none;
 }
 
 @media (max-width: 768px) {
-  .ad-bottom-wrapper {
+  .ad-desktop-only {
     display: none;
+  }
+  .ad-mobile-only {
+    display: block;
   }
 }
 
