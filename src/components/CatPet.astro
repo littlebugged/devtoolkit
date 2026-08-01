@@ -1,5 +1,6 @@
-<div class="cat-pet" aria-hidden="true" title="Click me!">
+<div class="cat-pet" aria-hidden="true" title="Click to play, double-click to minimize">
   <div class="cat-bubble">Meow!</div>
+  <button class="cat-minimize" type="button" aria-label="Minimize cat">&times;</button>
   <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="cat-fur" x1="0" y1="0" x2="0" y2="1">
@@ -50,10 +51,19 @@
         <path d="M80 140 Q100 146 120 140" stroke="#c2410c" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.14" />
 
         <g class="cat-paws">
-          <ellipse cx="76" cy="180" rx="15" ry="10" fill="#fff7ed" />
-          <ellipse cx="76" cy="180" rx="10" ry="6" fill="#fed7aa" />
-          <ellipse cx="124" cy="180" rx="15" ry="10" fill="#fff7ed" />
-          <ellipse cx="124" cy="180" rx="10" ry="6" fill="#fed7aa" />
+          <path d="M60 140 C54 154, 50 164, 54 174 Q60 182, 76 182 Q92 182, 96 174 C96 164, 88 152, 82 140" fill="url(#cat-fur)" />
+          <ellipse cx="76" cy="176" rx="18" ry="10" fill="#fff7ed" stroke="#e8d5c4" stroke-width="1" />
+          <circle cx="68" cy="173" r="4.5" fill="#f4acb7" />
+          <circle cx="76" cy="170" r="4.5" fill="#f4acb7" />
+          <circle cx="84" cy="173" r="4.5" fill="#f4acb7" />
+          <ellipse cx="76" cy="179" rx="9" ry="5" fill="#f4acb7" />
+
+          <path d="M118 140 C112 152, 104 164, 104 174 Q108 182, 124 182 Q140 182, 146 174 C150 164, 146 154, 140 140" fill="url(#cat-fur)" />
+          <ellipse cx="124" cy="176" rx="18" ry="10" fill="#fff7ed" stroke="#e8d5c4" stroke-width="1" />
+          <circle cx="116" cy="173" r="4.5" fill="#f4acb7" />
+          <circle cx="124" cy="170" r="4.5" fill="#f4acb7" />
+          <circle cx="132" cy="173" r="4.5" fill="#f4acb7" />
+          <ellipse cx="124" cy="179" rx="9" ry="5" fill="#f4acb7" />
         </g>
 
         <g class="cat-head-idle">
@@ -119,6 +129,16 @@
     </g>
   </svg>
 </div>
+<button class="cat-paw-btn" type="button" aria-label="Show cat" title="Bring back the cat!">
+  <svg viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="12" cy="12" r="4.5"/>
+    <ellipse cx="6" cy="8" rx="3" ry="2.5" transform="rotate(-30 6 8)"/>
+    <ellipse cx="18" cy="8" rx="3" ry="2.5" transform="rotate(30 18 8)"/>
+    <ellipse cx="5" cy="15" rx="2.6" ry="2" transform="rotate(-20 5 15)"/>
+    <ellipse cx="19" cy="15" rx="2.6" ry="2" transform="rotate(20 19 15)"/>
+    <ellipse cx="12" cy="19" rx="2.4" ry="1.8"/>
+  </svg>
+</button>
 
 <script is:inline>
   (function () {
@@ -126,12 +146,15 @@
     if (!cat) return;
 
     var bubble = cat.querySelector('.cat-bubble');
+    var minimizeBtn = cat.querySelector('.cat-minimize');
+    var pawBtn = document.querySelector('.cat-paw-btn');
     var pupils = cat.querySelectorAll('.cat-pupil');
     var head = cat.querySelector('.cat-head-track');
     var svg = cat.querySelector('svg');
     var bounds;
     var busy = false;
     var idx = 0;
+    var minimized = localStorage.getItem('cattoolkit-cat-hidden') === '1';
 
     var actions = [
       { cls: 'cat-pet--jump', text: 'Meow!' },
@@ -140,12 +163,35 @@
       { cls: 'cat-pet--sleep', text: 'Zzz...' }
     ];
 
+    function setMinimized(val) {
+      minimized = val;
+      cat.style.display = val ? 'none' : '';
+      if (pawBtn) pawBtn.style.display = val ? 'flex' : 'none';
+      localStorage.setItem('cattoolkit-cat-hidden', val ? '1' : '0');
+      if (!val) updateBounds();
+    }
+
+    setMinimized(minimized);
+
+    if (minimizeBtn) {
+      minimizeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setMinimized(true);
+      });
+    }
+
+    if (pawBtn) {
+      pawBtn.addEventListener('click', function () {
+        setMinimized(false);
+      });
+    }
+
     function updateBounds() {
       if (svg) bounds = svg.getBoundingClientRect();
     }
 
     function trackMouse(e) {
-      if (!bounds) return;
+      if (!bounds || minimized) return;
       var cx = bounds.left + bounds.width / 2;
       var cy = bounds.top + bounds.height / 2;
       var dx = e.clientX - cx;
