@@ -9,8 +9,8 @@ const { id, class: className = '' } = Astro.props;
 
 <div class={`ad-slot ad-native ${className}`} id={id}>
   <iframe
-    srcdoc="<body style='margin:0;overflow:hidden'><script async src='https://pl30613585.effectivecpmnetwork.com/bf08dea8c88068055e396ef4d75871bd/invoke.js'></script><div id='container-bf08dea8c88068055e396ef4d75871bd'></div></body>"
-    sandbox="allow-scripts allow-popups"
+    src="/ad-native.html"
+    sandbox="allow-scripts allow-same-origin allow-popups"
     style="width:100%;height:250px;border:none;display:block;"
     loading="lazy"
     title="Advertisement"

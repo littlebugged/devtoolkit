@@ -9,8 +9,8 @@ const { id, class: className = '' } = Astro.props;
 
 <div class={`ad-slot ad-mobile ${className}`} id={id}>
   <iframe
-    srcdoc="<body style='margin:0;overflow:hidden;display:flex;justify-content:center'><script>atOptions={'key':'39dadd8402e5535e2cc01e654c00b6c8','format':'iframe','height':50,'width':320,'params':{}};</script><script src='https://www.highperformanceformat.com/39dadd8402e5535e2cc01e654c00b6c8/invoke.js'></script></body>"
-    sandbox="allow-scripts allow-popups"
+    src="/ad-mobile.html"
+    sandbox="allow-scripts allow-same-origin allow-popups"
     style="width:320px;height:50px;border:none;display:block;margin:0 auto;"
     loading="lazy"
     title="Advertisement"
