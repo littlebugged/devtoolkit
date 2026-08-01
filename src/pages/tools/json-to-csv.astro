@@ -27,9 +27,9 @@ const tool = getToolBySlug('json-to-csv')!;
 
   <div slot="info">
     <h2>How to Use</h2>
-    <p>Paste a JSON array of objects into the left panel and click <strong>Convert</strong>. The tool extracts all unique keys as CSV headers and converts each object into a row. Click <strong>Download</strong> to save as a .csv file.</p>
-    <h3>Supported Formats</h3>
-    <p>Input must be a JSON array of objects. Nested objects are stringified. Values containing commas or quotes are properly escaped per RFC 4180. This tool runs entirely in your browser.</p>
+    <p>Paste an array of JSON objects in the left panel, then click <strong>Convert</strong>. The tool extracts all unique keys as CSV headers and converts each object into a row. Click <strong>Download</strong> to save the result as a .csv file.</p>
+    <h3>Supported Format</h3>
+    <p>Input must be a JSON array of objects. Nested objects are serialized as strings. Values containing commas or quotes are properly escaped according to RFC 4180. This tool runs entirely in your browser.</p>
   </div>
 
   <script is:inline>

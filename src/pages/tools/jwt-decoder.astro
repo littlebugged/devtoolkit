@@ -34,11 +34,11 @@ const tool = getToolBySlug('jwt-decoder')!;
 
   <div slot="info">
     <h2>How to Use</h2>
-    <p>Paste a JSON Web Token into the input field and click <strong>Decode</strong>. The tool splits the token into its three parts — Header, Payload, and Signature — and displays the decoded JSON. Expiration times are automatically converted to readable dates.</p>
+    <p>Paste a JSON Web Token into the input box and click <strong>Decode</strong>. The tool splits the token into three parts — Header, Payload, and Signature — and displays the decoded JSON. Expiration times are automatically converted to readable dates.</p>
     <h3>What is a JWT?</h3>
-    <p>A JSON Web Token (JWT) is a compact, URL-safe token format used for authentication and information exchange. It consists of three Base64URL-encoded parts separated by dots: <code>header.payload.signature</code>. The header specifies the signing algorithm, the payload contains claims (user data, expiration, etc.), and the signature verifies integrity.</p>
+    <p>JSON Web Token (JWT) is a compact, URL-safe token format used for authentication and information exchange. It consists of three Base64URL-encoded parts separated by dots: <code>header.payload.signature</code>. The header specifies the signing algorithm, the payload contains claims (user data, expiration, etc.), and the signature is used to verify integrity.</p>
     <h3>Security Note</h3>
-    <p>This tool only <em>decodes</em> the token — it does not verify the signature. Never share JWTs containing sensitive data. All decoding happens locally in your browser.</p>
+    <p>This tool only <em>decodes</em> tokens — it does not verify signatures. Never share JWTs containing sensitive data. All decoding happens locally in your browser.</p>
   </div>
 
   <script is:inline>
@@ -50,7 +50,7 @@ const tool = getToolBySlug('jwt-decoder')!;
 
     function decodeJwt(token) {
       const parts = token.trim().split('.');
-      if (parts.length !== 3) throw new Error('Invalid JWT: must have 3 parts separated by dots');
+      if (parts.length !== 3) throw new Error('Invalid JWT: must contain three dot-separated parts');
       const header = JSON.parse(base64UrlDecode(parts[0]));
       const payload = JSON.parse(base64UrlDecode(parts[1]));
       return { header, payload, signature: parts[2] };

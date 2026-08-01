@@ -4,58 +4,91 @@ import AdBanner from '../components/AdBanner.astro';
 import AdNative from '../components/AdNative.astro';
 import AdMobile from '../components/AdMobile.astro';
 import { categories, tools, getToolsByCategory } from '../data/tools';
+import Icon from '../components/Icon.astro';
 ---
 
 <BaseLayout
   title="Home"
-  description="Free online developer tools — JSON formatter, Base64 encoder, UUID generator, hash generator, and more. All tools run locally in your browser. No signup, no data collection."
-  keywords={['online tools', 'developer tools', 'web tools', 'free tools', 'json formatter', 'base64', 'uuid generator']}
+  description="CatToolKit — cat-themed developer tools that run locally in your browser. Fast, private, and purrfectly simple."
+  keywords={['developer tools', 'online tools', 'JSON formatter', 'Base64', 'UUID', 'hash generator', 'local', 'privacy']}
 >
   <div class="hero">
-    <h1>Free Online Developer Tools</h1>
-    <p>Fast, private, and free. All tools run entirely in your browser — no data is ever sent to a server.</p>
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.5"/>
+        <ellipse cx="6" cy="8" rx="3" ry="2.5" transform="rotate(-30 6 8)"/>
+        <ellipse cx="18" cy="8" rx="3" ry="2.5" transform="rotate(30 18 8)"/>
+        <ellipse cx="5" cy="15" rx="2.6" ry="2" transform="rotate(-20 5 15)"/>
+        <ellipse cx="19" cy="15" rx="2.6" ry="2" transform="rotate(20 19 15)"/>
+        <ellipse cx="12" cy="19" rx="2.4" ry="1.8"/>
+      </svg>
+      Local-first · Privacy-friendly
+    </div>
+    <h1>CatToolKit</h1>
+    <p>Cat-themed developer tools that run entirely in your browser. Fast, private, and purrfectly simple.</p>
+    <a href="#tools" class="hero-cta">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      Explore tools
+    </a>
+  </div>
+
+  <div class="trust-bar">
+    <span class="trust-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Data stays on device
+    </span>
+    <span class="trust-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      No signup
+    </span>
+    <span class="trust-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Free forever
+    </span>
   </div>
 
   <!-- Top Ad -->
   <AdBanner id="ad-home-top" class="ad-top" />
 
-  {categories.map(cat => {
-    const catTools = getToolsByCategory(cat.id);
-    if (catTools.length === 0) return null;
-    return (
-      <section class="category-section">
-        <h2 class="category-title">
-          <span>{cat.icon}</span>
-          {cat.name}
-        </h2>
-        <div class="tools-grid">
-          {catTools.map(tool => (
-            <a href={`/tools/${tool.slug}`} class="tool-card">
-              <div class="tool-card-icon">{tool.icon}</div>
-              <h3>{tool.name}</h3>
-              <p>{tool.description}</p>
-            </a>
-          ))}
-        </div>
-      </section>
-    );
-  })}
+  <div id="tools">
+    {categories.map(cat => {
+      const catTools = getToolsByCategory(cat.id);
+      if (catTools.length === 0) return null;
+      return (
+        <section class="category-section">
+          <h2 class="category-title">
+            <Icon name={cat.icon} />
+            {cat.name}
+          </h2>
+          <div class="tools-grid">
+            {catTools.map(tool => (
+              <a href={`/tools/${tool.slug}`} class="tool-card">
+                <div class="tool-card-icon"><Icon name={tool.icon} /></div>
+                <h3>{tool.name}</h3>
+                <p>{tool.description}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+      );
+    })}
+  </div>
 
   <!-- Bottom Ad -->
   <AdNative id="ad-home-bottom" class="ad-bottom ad-desktop-only" />
   <AdMobile id="ad-home-bottom-mobile" class="ad-bottom ad-mobile-only" />
 
-  <!-- WebSite Schema for Google Sitelinks Search Box -->
+  <!-- WebSite Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'DevToolKit',
+    name: 'CatToolKit',
     url: 'https://xxmind.cc.cd',
-    description: 'Free online developer tools — JSON formatter, Base64 encoder, UUID generator, hash generator, and more. All tools run locally in your browser.',
+    description: 'Cat-themed developer tools that run locally in your browser. Fast, private, and purrfectly simple.',
     inLanguage: 'en',
     publisher: {
       '@type': 'Organization',
-      name: 'DevToolKit',
+      name: 'CatToolKit',
       url: 'https://xxmind.cc.cd',
       logo: {
         '@type': 'ImageObject',
@@ -64,12 +97,12 @@ import { categories, tools, getToolsByCategory } from '../data/tools';
     },
   })} />
 
-  <!-- ItemList Schema for tool collection -->
+  <!-- ItemList Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Free Online Developer Tools',
-    description: 'A collection of free, privacy-focused developer tools that run entirely in your browser.',
+    name: 'CatToolKit Tools',
+    description: 'A collection of developer tools that run locally in your browser.',
     numberOfItems: tools.length,
     itemListElement: tools.map((tool, i) => ({
       '@type': 'ListItem',
@@ -79,30 +112,30 @@ import { categories, tools, getToolsByCategory } from '../data/tools';
     })),
   })} />
 
-  <!-- FAQ Schema: helps machines understand content -->
+  <!-- FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What is DevToolKit?',
+        name: 'What is CatToolKit?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'DevToolKit is a collection of free, fast, and privacy-focused online tools for developers, designers, and everyday users. Every tool runs 100% in your browser — your data never leaves your device.'
+          text: 'CatToolKit is a collection of free, fast, and privacy-focused online tools for developers. Every tool runs 100% in your browser — your data never leaves your device.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Is DevToolKit free to use?',
+        name: 'Is CatToolKit free to use?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes, all tools on DevToolKit are completely free to use. No signup, no account, and no hidden costs. Just open a tool and start using it instantly.'
+          text: 'Yes, all tools on CatToolKit are completely free to use. No signup, no account, and no hidden costs.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Is my data safe when using DevToolKit?',
+        name: 'Is my data safe with CatToolKit?',
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Absolutely. All tools run 100% client-side in your browser using JavaScript. Your data is never uploaded to any server, never stored, and never shared with anyone.'
@@ -110,18 +143,18 @@ import { categories, tools, getToolsByCategory } from '../data/tools';
       },
       {
         '@type': 'Question',
-        name: 'What tools are available on DevToolKit?',
+        name: 'What tools does CatToolKit offer?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'DevToolKit offers JSON Formatter & Validator, Base64 Encoder/Decoder, URL Encoder/Decoder, UUID Generator, Hash Generator (SHA-1, SHA-256, SHA-512), Password Generator, Color Picker & Converter, Unix Timestamp Converter, Lorem Ipsum Generator, Word & Character Counter, Text Case Converter, and Markdown Preview.'
+          text: 'CatToolKit offers JSON Formatter & Validator, Base64 Encoder/Decoder, URL Encoder/Decoder, UUID Generator, Hash Generator (SHA-1, SHA-256, SHA-512), Password Generator, Color Picker & Converter, Unix Timestamp Converter, Lorem Ipsum Generator, Word & Character Counter, Text Case Converter, Markdown Preview, Regex Tester, Diff Checker, JSON to CSV Converter, JWT Decoder, and HTML Entity Encoder/Decoder.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Does DevToolKit work on mobile devices?',
+        name: 'Does CatToolKit work on mobile?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes, DevToolKit is fully responsive and works perfectly on phones, tablets, and desktops. All tools are optimized for touch interfaces and smaller screens.'
+          text: 'Yes, CatToolKit is fully responsive and works perfectly on phones, tablets, and desktops.'
         }
       }
     ]

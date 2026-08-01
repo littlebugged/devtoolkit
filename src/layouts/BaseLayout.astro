@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import CatPet from '../components/CatPet.astro';
 
 interface Props {
   title: string;
@@ -10,33 +11,32 @@ interface Props {
 }
 
 const { title, description, keywords = [], canonical, ogImage } = Astro.props;
-const siteName = 'DevToolKit';
-const fullTitle = title === 'Home' ? `${siteName} - Free Online Developer Tools` : `${title} - ${siteName}`;
+const siteName = 'CatToolKit';
+const fullTitle = title === 'Home' ? `${siteName} — Local Developer Tools` : `${title} — ${siteName}`;
 const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="light">
 <head>
   <meta charset="utf-8" />
   <script is:inline>
     (function() {
       try {
-        var saved = localStorage.getItem('devtoolkit-theme');
-        var mode = 'dark';
+        var saved = localStorage.getItem('cattoolkit-theme');
+        var mode = 'light';
         if (saved) {
           var t = JSON.parse(saved);
           if (t.auto) {
             var h = new Date().getHours();
             mode = (h >= 6 && h < 18) ? 'light' : 'dark';
           } else {
-            mode = t.mode || 'dark';
+            mode = t.mode || 'light';
           }
-          if (t.color) document.documentElement.setAttribute('data-theme', t.color);
         } else {
           var h = new Date().getHours();
           mode = (h >= 6 && h < 18) ? 'light' : 'dark';
-          localStorage.setItem('devtoolkit-theme', JSON.stringify({ mode: mode, auto: true }));
+          localStorage.setItem('cattoolkit-theme', JSON.stringify({ mode: mode, auto: true }));
         }
         document.documentElement.classList.remove('dark', 'light');
         document.documentElement.classList.add(mode);
@@ -71,15 +71,6 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
 
   <title>{fullTitle}</title>
 
-  <!-- Performance hints -->
-  <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-  <link rel="dns-prefetch" href="//www.highperformanceformat.com" />
-  <link rel="dns-prefetch" href="//pl30613587.effectivecpmnetwork.com" />
-
-  <!-- Language / Region -->
-  <link rel="alternate" hreflang="en" href={canonicalUrl} />
-  <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
-
   <!-- Google Fonts - Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -90,7 +81,16 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
   <header class="site-header">
     <div class="header-inner">
       <a href="/" class="logo">
-        <span class="logo-icon">⚡</span>
+        <span class="logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="12" r="4.5"/>
+            <ellipse cx="6" cy="8" rx="3" ry="2.5" transform="rotate(-30 6 8)"/>
+            <ellipse cx="18" cy="8" rx="3" ry="2.5" transform="rotate(30 18 8)"/>
+            <ellipse cx="5" cy="15" rx="2.6" ry="2" transform="rotate(-20 5 15)"/>
+            <ellipse cx="19" cy="15" rx="2.6" ry="2" transform="rotate(20 19 15)"/>
+            <ellipse cx="12" cy="19" rx="2.4" ry="1.8"/>
+          </svg>
+        </span>
         {siteName}
       </a>
       <nav>
@@ -101,23 +101,9 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
       </nav>
       <div class="theme-switcher">
         <button type="button" class="theme-mode-btn" aria-label="Toggle dark mode">
-          <svg class="theme-mode-icon-dark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.354 15.354A9 9 0 0 1 8.646 3.646 9.003 9.003 0 0 0 12 21a9.003 9.003 0 0 0 8.354-5.646z"/><path d="M18 2.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="currentColor" stroke="none" opacity="0.6"/></svg>
-          <svg class="theme-mode-icon-light" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18.01 18.01l1.77 1.77M2 12h2.5M19.5 12H22M4.22 19.78l1.77-1.77M18.01 5.99l1.77-1.77"/></svg>
+          <svg class="theme-mode-icon-dark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="theme-mode-icon-light" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
-        <button type="button" class="theme-color-toggle" aria-label="Choose theme color">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5c-1.4 2.8-5.5 6.8-5.5 10a5.5 5.5 0 0 0 11 0c0-3.2-4.1-7.2-5.5-10z"/><path d="M9.5 16a2.5 2.5 0 0 0 2.5 2.5" stroke-opacity="0.4"/></svg>
-        </button>
-        <div class="theme-popover" role="dialog" aria-label="Theme colors">
-          <span class="theme-popover-label">Theme color</span>
-          <div class="theme-color-grid">
-            <button type="button" class="theme-color-dot" data-color="indigo" aria-label="Indigo"></button>
-            <button type="button" class="theme-color-dot" data-color="violet" aria-label="Violet"></button>
-            <button type="button" class="theme-color-dot" data-color="cyan" aria-label="Cyan"></button>
-            <button type="button" class="theme-color-dot" data-color="rose" aria-label="Rose"></button>
-            <button type="button" class="theme-color-dot" data-color="emerald" aria-label="Emerald"></button>
-            <button type="button" class="theme-color-dot" data-color="amber" aria-label="Amber"></button>
-          </div>
-        </div>
       </div>
     </div>
   </header>
@@ -128,7 +114,7 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <p>&copy; {new Date().getFullYear()} {siteName}. All tools run in your browser — no data is sent to any server.</p>
+      <p>&copy; {new Date().getFullYear()} {siteName}. All tool processing runs locally in your browser.</p>
       <ul class="footer-links">
         <li><a href="/">All Tools</a></li>
         <li><a href="/about">About</a></li>
@@ -153,11 +139,11 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
 
   <script is:inline>
     (function() {
-      const STORAGE_KEY = 'devtoolkit-theme';
+      const STORAGE_KEY = 'cattoolkit-theme';
       const root = document.documentElement;
 
-      function saveTheme(mode, color, auto) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode: mode, color: color, auto: !!auto }));
+      function saveTheme(mode, auto) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode: mode, auto: !!auto }));
       }
 
       function updateModeIcons() {
@@ -166,56 +152,20 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
         document.querySelectorAll('.theme-mode-icon-light').forEach(el => el.style.display = isLight ? 'block' : 'none');
       }
 
-      function updateColorDots() {
-        const current = root.getAttribute('data-theme') || 'indigo';
-        document.querySelectorAll('.theme-color-dot').forEach(dot => {
-          dot.classList.toggle('active', dot.dataset.color === current);
-        });
-      }
-
       document.querySelectorAll('.theme-mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const isLight = root.classList.toggle('light');
           root.classList.toggle('dark', !isLight);
-          const color = root.getAttribute('data-theme') || 'indigo';
-          saveTheme(isLight ? 'light' : 'dark', color, false);
+          saveTheme(isLight ? 'light' : 'dark', false);
           updateModeIcons();
         });
       });
 
-      document.querySelectorAll('.theme-color-toggle').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const popover = btn.closest('.theme-switcher').querySelector('.theme-popover');
-          popover.classList.toggle('open');
-        });
-      });
-
-      document.querySelectorAll('.theme-color-dot').forEach(dot => {
-        dot.addEventListener('click', () => {
-          const color = dot.dataset.color;
-          root.setAttribute('data-theme', color);
-          const mode = root.classList.contains('light') ? 'light' : 'dark';
-          try {
-            const prev = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-            saveTheme(mode, color, prev.auto);
-          } catch (_) {
-            saveTheme(mode, color, false);
-          }
-          updateColorDots();
-        });
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.theme-switcher')) {
-          document.querySelectorAll('.theme-popover').forEach(p => p.classList.remove('open'));
-        }
-      });
-
       updateModeIcons();
-      updateColorDots();
     })();
   </script>
+
+  <CatPet />
 
   <!-- Auto-hide empty ad containers -->
   <script is:inline>
@@ -228,8 +178,5 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
       });
     }, 3000);
   </script>
-
-  <!-- Adsterra global ad (popunder/social bar) - loaded async at end of body -->
-  <script is:inline async data-cfasync="false" type='text/javascript' src="https://pl30613587.effectivecpmnetwork.com/b2/19/e0/b219e04b0e76ad939e61f83b271f5d1a.js"></script>
 </body>
 </html>

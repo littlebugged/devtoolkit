@@ -1,0 +1,190 @@
+<div class="cat-pet" aria-hidden="true" title="Click me!">
+  <div class="cat-bubble">Meow!</div>
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="cat-fur" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffb366" />
+        <stop offset="100%" stop-color="#f97316" />
+      </linearGradient>
+      <linearGradient id="cat-fur-dark" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fb923c" />
+        <stop offset="100%" stop-color="#ea580c" />
+      </linearGradient>
+      <radialGradient id="cat-blush" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ff8fa3" stop-opacity="0.6" />
+        <stop offset="100%" stop-color="#ff8fa3" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="cat-eye" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#4ade80" />
+        <stop offset="100%" stop-color="#16a34a" />
+      </linearGradient>
+      <filter id="cat-soft-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+        <feOffset dx="0" dy="3" result="offsetblur" />
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="0.18" />
+        </feComponentTransfer>
+        <feMerge>
+          <feMergeNode />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    <g class="cat-scene">
+      <ellipse class="cat-shadow" cx="100" cy="184" rx="56" ry="8" fill="#000" />
+
+      <g class="cat-tail">
+        <path
+          d="M128 146 C170 126, 184 64, 150 30 C138 18, 120 28, 130 44 C156 74, 142 122, 118 144 Z"
+          fill="url(#cat-fur-dark)"
+        />
+      </g>
+
+      <g class="cat-float">
+        <ellipse cx="100" cy="144" rx="52" ry="42" fill="url(#cat-fur)" />
+        <ellipse cx="100" cy="154" rx="32" ry="22" fill="#fff7ed" opacity="0.85" />
+
+        <path d="M80 116 Q100 124 120 116" stroke="#c2410c" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.22" />
+        <path d="M76 128 Q100 136 124 128" stroke="#c2410c" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.18" />
+        <path d="M80 140 Q100 146 120 140" stroke="#c2410c" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.14" />
+
+        <g class="cat-paws">
+          <ellipse cx="76" cy="180" rx="15" ry="10" fill="#fff7ed" />
+          <ellipse cx="76" cy="180" rx="10" ry="6" fill="#fed7aa" />
+          <ellipse cx="124" cy="180" rx="15" ry="10" fill="#fff7ed" />
+          <ellipse cx="124" cy="180" rx="10" ry="6" fill="#fed7aa" />
+        </g>
+
+        <g class="cat-head-idle">
+          <g class="cat-head-track">
+            <g class="cat-ear cat-ear-left">
+              <path d="M42 48 L58 6 L84 36 Z" fill="url(#cat-fur)" />
+              <path d="M52 40 L60 18 L76 34 Z" fill="#fecdd3" />
+            </g>
+            <g class="cat-ear cat-ear-right">
+              <path d="M158 48 L142 6 L116 36 Z" fill="url(#cat-fur)" />
+              <path d="M148 40 L140 18 L124 34 Z" fill="#fecdd3" />
+            </g>
+
+            <circle cx="100" cy="80" r="64" fill="url(#cat-fur)" filter="url(#cat-soft-shadow)" />
+
+            <g stroke="#c2410c" stroke-width="3" stroke-linecap="round" opacity="0.22">
+              <path d="M100 18 L96 32" />
+              <path d="M100 18 L104 32" />
+            </g>
+
+            <ellipse cx="100" cy="94" rx="36" ry="26" fill="#fff7ed" opacity="0.7" />
+
+            <g class="cat-eyes">
+              <g class="cat-eye-left">
+                <ellipse cx="74" cy="72" rx="15" ry="17" fill="#ffffff" />
+                <g class="cat-pupil cat-pupil-left">
+                  <ellipse cx="74" cy="72" rx="9" ry="11" fill="url(#cat-eye)" />
+                  <circle cx="74" cy="72" r="4.5" fill="#1f2937" />
+                  <circle cx="77" cy="68" r="3.5" fill="#ffffff" />
+                </g>
+              </g>
+              <g class="cat-eye-right">
+                <ellipse cx="126" cy="72" rx="15" ry="17" fill="#ffffff" />
+                <g class="cat-pupil cat-pupil-right">
+                  <ellipse cx="126" cy="72" rx="9" ry="11" fill="url(#cat-eye)" />
+                  <circle cx="126" cy="72" r="4.5" fill="#1f2937" />
+                  <circle cx="129" cy="68" r="3.5" fill="#ffffff" />
+                </g>
+              </g>
+            </g>
+
+            <g class="cat-sleep-eyes">
+              <path d="M58 72 Q74 80 90 72" stroke="#1f2937" stroke-width="3" stroke-linecap="round" fill="none" />
+              <path d="M110 72 Q126 80 142 72" stroke="#1f2937" stroke-width="3" stroke-linecap="round" fill="none" />
+            </g>
+
+            <ellipse cx="54" cy="92" rx="11" ry="7" fill="url(#cat-blush)" />
+            <ellipse cx="146" cy="92" rx="11" ry="7" fill="url(#cat-blush)" />
+
+            <ellipse cx="100" cy="96" rx="6" ry="4" fill="#ff8fa3" />
+            <path d="M100 100 Q92 108 84 104" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round" fill="none" />
+            <path d="M100 100 Q108 108 116 104" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round" fill="none" />
+
+            <g stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.6">
+              <line x1="46" y1="92" x2="24" y2="88" />
+              <line x1="46" y1="98" x2="22" y2="98" />
+              <line x1="154" y1="92" x2="176" y2="88" />
+              <line x1="154" y1="98" x2="178" y2="98" />
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </svg>
+</div>
+
+<script is:inline>
+  (function () {
+    var cat = document.querySelector('.cat-pet');
+    if (!cat) return;
+
+    var bubble = cat.querySelector('.cat-bubble');
+    var pupils = cat.querySelectorAll('.cat-pupil');
+    var head = cat.querySelector('.cat-head-track');
+    var svg = cat.querySelector('svg');
+    var bounds;
+    var busy = false;
+    var idx = 0;
+
+    var actions = [
+      { cls: 'cat-pet--jump', text: 'Meow!' },
+      { cls: 'cat-pet--spin', text: 'Round~' },
+      { cls: 'cat-pet--wiggle', text: 'Hehe!' },
+      { cls: 'cat-pet--sleep', text: 'Zzz...' }
+    ];
+
+    function updateBounds() {
+      if (svg) bounds = svg.getBoundingClientRect();
+    }
+
+    function trackMouse(e) {
+      if (!bounds) return;
+      var cx = bounds.left + bounds.width / 2;
+      var cy = bounds.top + bounds.height / 2;
+      var dx = e.clientX - cx;
+      var dy = e.clientY - cy;
+      var max = Math.max(window.innerWidth, window.innerHeight) * 0.5;
+      var nx = Math.max(-1, Math.min(1, dx / max));
+      var ny = Math.max(-1, Math.min(1, dy / max));
+
+      pupils.forEach(function (p) {
+        p.style.setProperty('--px', Math.round(nx * 5 * 10) / 10);
+        p.style.setProperty('--py', Math.round(ny * 4 * 10) / 10);
+      });
+
+      if (head) {
+        head.style.setProperty('--head-rotate', Math.round(nx * 10 * 10) / 10 + 'deg');
+        head.style.setProperty('--head-x', Math.round(nx * 3 * 10) / 10 + 'px');
+        head.style.setProperty('--head-y', Math.round(ny * 2 * 10) / 10 + 'px');
+      }
+    }
+
+    updateBounds();
+    window.addEventListener('resize', updateBounds);
+    window.addEventListener('mousemove', trackMouse);
+
+    cat.addEventListener('click', function () {
+      if (busy) return;
+      busy = true;
+
+      var action = actions[idx % actions.length];
+      idx += 1;
+
+      if (bubble) bubble.textContent = action.text;
+      cat.classList.add(action.cls, 'cat-pet--active');
+
+      setTimeout(function () {
+        cat.classList.remove(action.cls, 'cat-pet--active');
+        if (bubble) bubble.textContent = 'Meow!';
+        busy = false;
+      }, action.cls === 'cat-pet--sleep' ? 1600 : 1200);
+    });
+  })();
+</script>

@@ -7,7 +7,7 @@ const tool = getToolBySlug('regex-tester')!;
 <ToolLayout tool={tool}>
   <div class="tool-controls">
     <div class="regex-input-row">
-      <label for="regex-pattern">Pattern</label>
+      <label for="regex-pattern">Regular Expression</label>
       <div class="regex-pattern-wrap">
         <span class="regex-delimiter">/</span>
         <input type="text" id="regex-pattern" placeholder="[A-Za-z0-9]+" />
@@ -20,7 +20,7 @@ const tool = getToolBySlug('regex-tester')!;
   <div class="tool-panels">
     <div class="tool-panel">
       <label for="regex-input">Test String</label>
-      <textarea id="regex-input" placeholder="Enter text to test against the regex...">The quick brown fox jumps over 42 lazy dogs in 2026.</textarea>
+      <textarea id="regex-input" placeholder="Enter text to test your regular expression…">The quick brown fox jumps over 42 lazy dogs in 2026.</textarea>
     </div>
     <div class="tool-panel">
       <div class="regex-results" id="regex-results">
@@ -33,11 +33,11 @@ const tool = getToolBySlug('regex-tester')!;
 
   <div slot="info">
     <h2>How to Use</h2>
-    <p>Enter a regular expression pattern in the top field and set flags (g for global, i for case-insensitive, m for multiline). Type or paste your test string below. Matches are highlighted in real time, and capture groups are listed separately.</p>
+    <p>Enter a regex pattern at the top and set flags (g for global, i for ignore case, m for multiline). Type or paste a test string below. Matches are highlighted live, and capture groups are listed separately.</p>
     <h3>Regex Flags</h3>
-    <p><strong>g</strong> (global) — find all matches. <strong>i</strong> — case-insensitive. <strong>m</strong> — multiline (^ and $ match line boundaries). <strong>s</strong> — dotAll (. matches newline). <strong>u</strong> — unicode. Combine flags as needed, e.g. <code>gi</code>.</p>
+    <p><strong>g</strong> (global) — find all matches. <strong>i</strong> — ignore case. <strong>m</strong> — multiline (^ and $ match line boundaries). <strong>s</strong> — dot matches newlines. <strong>u</strong> — Unicode. Combine as needed, e.g. <code>gi</code>.</p>
     <h3>Common Patterns</h3>
-    <p>Email: <code>{'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'}</code>. URL: <code>{'https?://[^\\s]+'}</code>. Numbers: <code>\d+</code>. This tool uses the JavaScript regex engine running in your browser.</p>
+    <p>Email: <code>{'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'}</code>. URL: <code>{'https?://[^\\s]+'}</code>. Numbers: <code>\d+</code>. This tool uses the JavaScript regex engine in your browser.</p>
   </div>
 
   <script is:inline>
@@ -58,7 +58,7 @@ const tool = getToolBySlug('regex-tester')!;
       const text = inputEl.value;
 
       if (!pattern) {
-        infoEl.textContent = 'Enter a pattern above';
+        infoEl.textContent = 'Enter a regular expression above';
         highlightEl.innerHTML = escapeHtml(text);
         groupsEl.innerHTML = '';
         return;
@@ -79,19 +79,19 @@ const tool = getToolBySlug('regex-tester')!;
       if (!flags.includes('g')) {
         const m = text.match(re);
         if (!m) {
-          infoEl.textContent = 'No match';
+          infoEl.textContent = 'No matches';
           highlightEl.innerHTML = escapeHtml(text);
           groupsEl.innerHTML = '';
           return;
         }
-        infoEl.textContent = '1 match found';
+        infoEl.textContent = 'Found 1 match';
         const idx = m.index;
         const before = escapeHtml(text.slice(0, idx));
         const match = '<mark>' + escapeHtml(m[0]) + '</mark>';
         const after = escapeHtml(text.slice(idx + m[0].length));
         highlightEl.innerHTML = before + match + after;
         if (m.length > 1) {
-          groupsEl.innerHTML = '<strong>Groups:</strong> ' + m.slice(1).map((g, i) => `<span class="regex-group">Group ${i+1}: ${escapeHtml(g || '')}</span>`).join(' ');
+          groupsEl.innerHTML = '<strong>Capture groups:</strong> ' + m.slice(1).map((g, i) => `<span class="regex-group">Group ${i+1}: ${escapeHtml(g || '')}</span>`).join(' ');
         } else {
           groupsEl.innerHTML = '';
         }
@@ -113,7 +113,7 @@ const tool = getToolBySlug('regex-tester')!;
         return;
       }
 
-      infoEl.textContent = matches.length + ' match' + (matches.length > 1 ? 'es' : '') + ' found';
+      infoEl.textContent = 'Found ' + matches.length + ' matches';
       let html = '';
       let lastEnd = 0;
       matches.forEach(m => {
@@ -126,7 +126,7 @@ const tool = getToolBySlug('regex-tester')!;
 
       const withGroups = matches.filter(m => m.groups.length > 0);
       if (withGroups.length > 0) {
-        groupsEl.innerHTML = '<strong>Groups:</strong><br>' + withGroups.map((m, i) =>
+        groupsEl.innerHTML = '<strong>Capture groups:</strong><br>' + withGroups.map((m, i) =>
           `Match ${i+1}: ` + m.groups.map((g, gi) => `<span class="regex-group">Group ${gi+1}: ${escapeHtml(g || '')}</span>`).join(' ')
         ).join('<br>');
       } else {

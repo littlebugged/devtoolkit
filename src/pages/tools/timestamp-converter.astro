@@ -35,14 +35,14 @@ const tool = getToolBySlug('timestamp-converter')!;
           <div class="result-box" id="ts-utc" title="Click to copy">—</div>
         </div>
         <div class="hash-item" style="margin-top: 0.5rem;">
-          <label>Local</label>
+          <label>Local Time</label>
           <div class="result-box" id="ts-local" title="Click to copy">—</div>
         </div>
       </div>
     </div>
     <div class="io-panel">
       <label for="date-input">Date String → Timestamp</label>
-      <input type="text" id="date-input" placeholder="e.g. 2024-01-01 or Jan 1, 2024 12:00:00" spellcheck="false" />
+      <input type="text" id="date-input" placeholder="e.g. 2024-01-01 or January 1, 2026 12:00:00" spellcheck="false" />
       <div style="margin-top: 0.75rem;">
         <div class="hash-item">
           <label>Unix Timestamp (seconds)</label>
@@ -59,27 +59,22 @@ const tool = getToolBySlug('timestamp-converter')!;
   <div slot="info" class="tool-info">
     <h2>How to Use</h2>
     <p>
-      The current Unix timestamp updates live at the top. Enter a timestamp (seconds or milliseconds)
-      in the left panel to see the equivalent date in ISO, UTC, and local formats. Enter a date string
-      in the right panel to get the corresponding Unix timestamp. Click any result to copy it, or use
-      the <strong>Now</strong> button to fill in the current timestamp.
+      The current Unix timestamp updates live at the top. Enter a timestamp (seconds or milliseconds) in the left panel to see the corresponding ISO, UTC, and local formats.
+      Enter a date string in the right panel to get its Unix timestamp. Click any result to copy, or use the <strong>Now</strong> button to fill in the current timestamp.
     </p>
     <h3>What is a Unix Timestamp?</h3>
     <p>
-      A Unix timestamp (also called epoch time) represents the number of seconds that have elapsed since
-      January 1, 1970, 00:00:00 UTC — known as the Unix epoch. It is a universal, timezone-independent
-      way to represent a point in time, widely used in programming, databases, APIs, and log files.
+      A Unix timestamp (also called epoch time) is the number of seconds that have elapsed since January 1, 1970, 00:00:00 UTC (the Unix epoch).
+      It is a universal, timezone-independent way to represent time, widely used in programming, databases, APIs, and log files.
     </p>
-    <h3>Seconds vs Milliseconds</h3>
+    <h3>Seconds vs. Milliseconds</h3>
     <p>
-      Standard Unix timestamps count seconds (10 digits for dates through 2286). JavaScript and many
-      modern systems use milliseconds (13 digits). This tool auto-detects the format: values with more
-      than 10 digits are treated as milliseconds.
+      Standard Unix timestamps are in seconds (10 digits until the year 2286). JavaScript and many modern systems use milliseconds (13 digits).
+      This tool auto-detects: values longer than 10 digits are treated as milliseconds.
     </p>
     <h3>Common Use Cases</h3>
     <p>
-      Debug API responses, decode log timestamps, verify JWT expiration claims, convert database epoch
-      values, and quickly check whether a timestamp is in the past or future during development.
+      Debugging API responses, decoding log timestamps, verifying JWT expiration claims, converting database epoch values, and quickly checking whether a timestamp is in the past or future.
     </p>
   </div>
 

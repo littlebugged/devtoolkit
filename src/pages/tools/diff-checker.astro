@@ -13,14 +13,14 @@ const tool = getToolBySlug('diff-checker')!;
 
   <div class="tool-panels">
     <div class="tool-panel">
-      <label for="diff-left">Original</label>
+      <label for="diff-left">Original Text</label>
       <textarea id="diff-left" placeholder="Paste original text here…">The quick brown fox
 jumps over the lazy dog.
 Hello world!
 This line stays the same.</textarea>
     </div>
     <div class="tool-panel">
-      <label for="diff-right">Modified</label>
+      <label for="diff-right">Modified Text</label>
       <textarea id="diff-right" placeholder="Paste modified text here…">The quick red fox
 jumps over the lazy cat.
 Hello universe!
@@ -33,9 +33,9 @@ A brand new line was added.</textarea>
 
   <div slot="info">
     <h2>How to Use</h2>
-    <p>Paste the original text on the left and the modified text on the right, then click <strong>Compare</strong>. Differences are highlighted: <span style="color:#4ade80;">green</span> for additions and <span style="color:#f87171;">red</span> for deletions. Lines that match are shown without highlighting.</p>
-    <h3>What is a Diff Checker?</h3>
-    <p>A diff checker compares two blocks of text line by line and highlights the differences. It's essential for code reviews, document revisions, and comparing configuration files. This tool runs entirely in your browser — no data is uploaded.</p>
+    <p>Paste the original text on the left and the modified text on the right, then click <strong>Compare</strong>. Differences are highlighted: <span style="color:#4ade80;">green</span> for additions and <span style="color:#f87171;">red</span> for deletions. Identical lines are not highlighted.</p>
+    <h3>What is Text Diff?</h3>
+    <p>A text diff tool compares two pieces of text line by line and highlights the differences. It is essential for code reviews, document revisions, and configuration file comparisons. This tool runs entirely in your browser — no data is uploaded.</p>
   </div>
 
   <script is:inline>
@@ -78,7 +78,7 @@ A brand new line was added.</textarea>
         if (d.type === 'remove') removes++;
         return `<div class="diff-line ${cls}"><span class="diff-prefix">${prefix}</span><span class="diff-text">${escapeHtml(d.text)}</span></div>`;
       }).join('');
-      const summary = `<div class="diff-summary"><span class="diff-stat-add">+${adds} additions</span> <span class="diff-stat-remove">-${removes} deletions</span></div>`;
+      const summary = `<div class="diff-summary"><span class="diff-stat-add">+${adds} added</span> <span class="diff-stat-remove">-${removes} removed</span></div>`;
       output.innerHTML = summary + '<div class="diff-body">' + lines + '</div>';
     }
 

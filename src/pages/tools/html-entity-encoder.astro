@@ -16,7 +16,7 @@ const tool = getToolBySlug('html-entity-encoder')!;
     <div class="tool-panel">
       <label for="entity-input">Input</label>
       <textarea id="entity-input" placeholder='<div class="hello">&amp; "quotes"'><h1>Hello & welcome!</h1>
-<p>Use &lt;code&gt; for "inline code" — it's <strong>important</strong>.</p>
+<p>Use &lt;code&gt; for "inline code" — this is <strong>important</strong>.</p>
 <script>alert('xss')</script></textarea>
     </div>
     <div class="tool-panel">
@@ -43,9 +43,9 @@ const tool = getToolBySlug('html-entity-encoder')!;
 
   <div slot="info">
     <h2>How to Use</h2>
-    <p>Paste HTML or text containing special characters into the input. Click <strong>Encode</strong> to convert special characters (&lt;, &gt;, &amp;, ", ') to their HTML entity equivalents, or click <strong>Decode</strong> to convert entities back to characters.</p>
+    <p>Paste HTML or text containing special characters into the input box. Click <strong>Encode</strong> to convert special characters (&lt;, &gt;, &amp;, ", ') into their corresponding HTML entities, or click <strong>Decode</strong> to restore entities back to characters.</p>
     <h3>Why Encode HTML Entities?</h3>
-    <p>HTML entity encoding prevents browsers from interpreting special characters as markup. This is essential for displaying code snippets on web pages, preventing XSS (cross-site scripting) attacks, and ensuring special characters render correctly in all browsers.</p>
+    <p>HTML entity encoding prevents the browser from parsing special characters as markup. This is essential for displaying code snippets on web pages, preventing XSS attacks, and ensuring special characters render correctly in every browser.</p>
   </div>
 
   <script is:inline>

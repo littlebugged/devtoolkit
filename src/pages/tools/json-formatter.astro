@@ -13,6 +13,11 @@ const tool = getToolBySlug('json-formatter')!;
     <button type="button" class="btn" id="btn-copy">Copy</button>
     <button type="button" class="btn" id="btn-clear">Clear</button>
     <button type="button" class="btn btn-toggle" id="btn-tree">Tree View</button>
+    <select id="indent-select" class="btn btn-sm indent-select" aria-label="Indentation">
+      <option value="2">2 spaces</option>
+      <option value="4">4 spaces</option>
+      <option value="tab">Tab</option>
+    </select>
   </div>
 
   <div id="json-status" class="json-status" aria-live="polite"></div>
@@ -24,7 +29,8 @@ const tool = getToolBySlug('json-formatter')!;
     </div>
     <div class="io-panel">
       <label>Output</label>
-      <textarea id="json-output" placeholder="Formatted JSON will appear here…" readonly spellcheck="false"></textarea>
+      <pre id="json-output-pre" class="json-highlighted"><code id="json-output-code"><span class="jh-placeholder">Formatted JSON will appear here…</span></code></pre>
+      <textarea id="json-output" style="display:none;" readonly spellcheck="false"></textarea>
       <div id="json-tree" class="json-tree" style="display:none;"></div>
     </div>
   </div>
@@ -60,6 +66,7 @@ const tool = getToolBySlug('json-formatter')!;
     }
     .json-status.valid { color: var(--color-success); }
     .json-status.invalid { color: var(--color-error); }
+    .json-status.repaired { color: var(--color-warning); }
     textarea.json-valid { border-color: var(--color-success); }
     textarea.json-invalid { border-color: var(--color-error); }
     .btn-toggle { font-size: 0.8rem; }
@@ -67,8 +74,79 @@ const tool = getToolBySlug('json-formatter')!;
       background: var(--color-primary);
       color: #fff;
     }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+    textarea.shake {
+      animation: shake 0.3s ease;
+      border-color: var(--color-warning) !important;
+    }
+    .indent-select {
+      margin-left: auto;
+      min-width: 0;
+      padding: 0.4rem 0.7rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b92a8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      padding-right: 1.5rem;
+    }
   </style>
   <style is:global>
+    .json-highlighted {
+      background: var(--color-input-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem;
+      font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      min-height: 240px;
+      max-height: 80vh;
+      overflow: auto;
+      white-space: pre;
+      tab-size: 2;
+      margin: 0;
+      counter-reset: jline;
+    }
+    .json-highlighted code {
+      display: block;
+      font-family: inherit;
+    }
+    .json-highlighted .jh-line {
+      display: block;
+    }
+    .json-highlighted .jh-line::before {
+      counter-increment: jline;
+      content: counter(jline);
+      display: inline-block;
+      width: 3.5ch;
+      text-align: right;
+      margin-right: 1.25em;
+      color: var(--color-text-muted);
+      opacity: 0.4;
+      user-select: none;
+      font-size: 0.8em;
+    }
+    .jh-key { color: #c2956a; }
+    .jh-str { color: #a3b18a; }
+    .jh-num { color: #e9c46a; }
+    .jh-bool { color: #f4acb7; }
+    .jh-null { color: var(--cat-whisker); font-style: italic; }
+    .jh-bracket { color: var(--color-text-muted); }
+    .jh-colon { color: var(--color-text-muted); }
+    .jh-comma { color: var(--color-text-muted); }
+    .jh-placeholder { color: var(--color-text-muted); }
+
+    html.dark .jh-key { color: #dbb895; }
+    html.dark .jh-str { color: #b7c99a; }
+    html.dark .jh-num { color: #f2d68a; }
+    html.dark .jh-bool { color: #f4acb7; }
+    html.dark .jh-null { color: #8a7c70; }
+
     .json-tree {
       background: var(--color-input-bg);
       border: 1px solid var(--color-border);
@@ -95,12 +173,15 @@ const tool = getToolBySlug('json-formatter')!;
     .jt-toggle:hover { color: var(--color-primary); }
     .jt-node { }
     .jt-node.jt-collapsed > .jt-row > .jt-toggle { transform: rotate(-90deg); }
-    .jt-key { color: #93c5fd; }
-    .jt-idx { color: #a78bfa; font-size: 0.75rem; opacity: 0.7; }
-    .jt-str { color: #86efac; }
-    .jt-num { color: #fbbf24; }
-    .jt-bool { color: #f472b6; }
-    .jt-null { color: #94a3b8; font-style: italic; }
+    .jt-key { color: #c2956a; }
+    .jt-idx { color: var(--cat-whisker); font-size: 0.75rem; opacity: 0.7; }
+    .jt-str { color: #a3b18a; }
+    .jt-num { color: #e9c46a; }
+    .jt-bool { color: #f4acb7; }
+    .jt-null { color: var(--cat-whisker); font-style: italic; }
+    html.dark .jt-key { color: #dbb895; }
+    html.dark .jt-str { color: #b7c99a; }
+    html.dark .jt-num { color: #f2d68a; }
     .jt-bracket { color: var(--color-text-muted); }
     .jt-comma { color: var(--color-text-muted); }
     .jt-type { color: var(--color-text-muted); font-size: 0.7rem; margin-left: 6px; opacity: 0.6; }
@@ -117,9 +198,18 @@ const tool = getToolBySlug('json-formatter')!;
     (function () {
       var input = document.getElementById('json-input');
       var output = document.getElementById('json-output');
+      var outputPre = document.getElementById('json-output-pre');
+      var outputCode = document.getElementById('json-output-code');
       var treeEl = document.getElementById('json-tree');
       var status = document.getElementById('json-status');
       var treeMode = false;
+      var lastRawOutput = '';
+      var indentSelect = document.getElementById('indent-select');
+
+      function getIndent() {
+        var v = indentSelect.value;
+        return v === 'tab' ? '\t' : parseInt(v, 10);
+      }
 
       function parseInput() {
         var text = input.value.trim();
@@ -131,6 +221,62 @@ const tool = getToolBySlug('json-formatter')!;
         }
       }
 
+      function tryRepair(text) {
+        var s = text;
+        s = s.replace(/\/\/.*$/gm, '');
+        s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+        s = s.replace(/,\s*([}\]])/g, '$1');
+        s = s.replace(/'/g, '"');
+        s = s.replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":');
+        try { return { ok: true, data: JSON.parse(s), repaired: true }; }
+        catch (e) { return null; }
+      }
+
+      function humanizeError(errMsg) {
+        if (/Unexpected token.*position\s*0/i.test(errMsg) || /Unexpected token.*at the beginning/i.test(errMsg))
+          return 'Input doesn\'t start with a valid JSON value (expected { or [)';
+        if (/Unexpected end of JSON/i.test(errMsg))
+          return 'JSON is incomplete — missing a closing bracket, brace, or quote';
+        if (/Unexpected token\s*}/i.test(errMsg))
+          return 'Unexpected } — likely a missing value or extra comma';
+        if (/Unexpected token\s*]/i.test(errMsg))
+          return 'Unexpected ] — likely a missing value or extra comma';
+        if (/Unexpected token\s*,/i.test(errMsg))
+          return 'Unexpected comma — possibly a trailing comma or missing value';
+        if (/Unexpected string/i.test(errMsg))
+          return 'Unexpected string — likely a missing comma between values';
+        if (/Unexpected number/i.test(errMsg))
+          return 'Unexpected number — likely a missing comma or colon';
+        return errMsg;
+      }
+
+      function extractErrorPosition(errMsg) {
+        var m = errMsg.match(/position\s+(\d+)/i);
+        if (m) return parseInt(m[1], 10);
+        m = errMsg.match(/at line (\d+) column (\d+)/i);
+        if (m) {
+          var lines = input.value.split('\n');
+          var line = parseInt(m[1], 10) - 1;
+          var col = parseInt(m[2], 10) - 1;
+          var pos = 0;
+          for (var i = 0; i < line && i < lines.length; i++) {
+            pos += lines[i].length + 1;
+          }
+          return pos + col;
+        }
+        return -1;
+      }
+
+      function highlightErrorPosition(errMsg) {
+        var pos = extractErrorPosition(errMsg);
+        if (pos < 0) return;
+        var text = input.value;
+        var start = Math.max(0, pos);
+        var end = Math.min(text.length, pos + 1);
+        input.focus();
+        input.setSelectionRange(start, end);
+      }
+
       function setStatus(result) {
         input.classList.remove('json-valid', 'json-invalid');
         if (result.empty) {
@@ -138,19 +284,67 @@ const tool = getToolBySlug('json-formatter')!;
           status.className = 'json-status';
           return;
         }
-        if (result.ok) {
+        if (result.repaired) {
+          status.textContent = '\u26A0 Auto-repaired — original had syntax issues';
+          status.className = 'json-status repaired';
+          input.classList.add('json-valid');
+        } else if (result.ok) {
           status.textContent = '\u2713 Valid JSON';
           status.className = 'json-status valid';
           input.classList.add('json-valid');
         } else {
-          status.textContent = '\u2717 Invalid JSON: ' + result.error;
+          var pos = extractErrorPosition(result.error);
+          var lineInfo = '';
+          if (pos >= 0) {
+            var before = input.value.substring(0, pos);
+            var lineNum = before.split('\n').length;
+            var colNum = pos - before.lastIndexOf('\n');
+            lineInfo = ' (line ' + lineNum + ', col ' + colNum + ')';
+          }
+          status.textContent = '\u2717 ' + humanizeError(result.error) + lineInfo;
           status.className = 'json-status invalid';
           input.classList.add('json-invalid');
+          highlightErrorPosition(result.error);
         }
       }
 
       function escHtml(s) {
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function highlightJson(jsonStr) {
+        var lines = jsonStr.split('\n');
+        var html = '';
+        var re = /("(?:[^"\\]|\\.)*")\s*:|("(?:[^"\\]|\\.)*")|([-+]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|(\btrue\b|\bfalse\b)|(\bnull\b)|([{}[\]])|([,:])/g;
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          var highlighted = escHtml(line).replace(
+            /(&quot;(?:[^&]|&(?!quot;))*?&quot;)\s*:|(&quot;(?:[^&]|&(?!quot;))*?&quot;)|([-+]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|(\btrue\b|\bfalse\b)|(\bnull\b)|([{}[\]])|([,:])/g,
+            function (m, key, str, num, bool, nul, bracket, punct) {
+              if (key) return '<span class="jh-key">' + key + '</span><span class="jh-colon">:</span>';
+              if (str) return '<span class="jh-str">' + str + '</span>';
+              if (num) return '<span class="jh-num">' + num + '</span>';
+              if (bool) return '<span class="jh-bool">' + bool + '</span>';
+              if (nul) return '<span class="jh-null">' + nul + '</span>';
+              if (bracket) return '<span class="jh-bracket">' + bracket + '</span>';
+              if (punct === ',') return '<span class="jh-comma">,</span>';
+              if (punct === ':') return '<span class="jh-colon">:</span>';
+              return m;
+            }
+          );
+          html += '<span class="jh-line">' + highlighted + '</span>';
+        }
+        return html;
+      }
+
+      function setHighlightedOutput(jsonStr) {
+        lastRawOutput = jsonStr;
+        output.value = jsonStr;
+        if (!jsonStr) {
+          outputCode.innerHTML = '<span class="jh-placeholder">Formatted JSON will appear here\u2026</span>';
+          return;
+        }
+        outputCode.innerHTML = highlightJson(jsonStr);
       }
 
       function buildTree(data, key, isLast, isArrayItem, arrayIndex) {
@@ -231,11 +425,29 @@ const tool = getToolBySlug('json-formatter')!;
         treeEl.innerHTML = buildTree(result.data, undefined, true, false);
       }
 
-      function formatJson(spaces) {
+      function shakeInput() {
+        input.classList.remove('shake');
+        void input.offsetWidth;
+        input.classList.add('shake');
+        input.focus();
+        setTimeout(function () { input.classList.remove('shake'); }, 350);
+      }
+
+      function formatJson(indent) {
         var result = parseInput();
-        if (result.empty) { showToast('Input is empty'); return; }
-        if (!result.ok) { setStatus(result); showToast('Fix JSON errors first'); return; }
-        output.value = JSON.stringify(result.data, null, spaces);
+        if (result.empty) { shakeInput(); showToast('Input is empty'); return; }
+        if (!result.ok) {
+          var repaired = tryRepair(input.value.trim());
+          if (repaired) {
+            result = repaired;
+          } else {
+            setStatus(result);
+            showToast('Fix JSON errors first');
+            return;
+          }
+        }
+        var formatted = JSON.stringify(result.data, null, indent);
+        setHighlightedOutput(formatted);
         setStatus(result);
         if (treeMode) renderTree();
       }
@@ -245,30 +457,54 @@ const tool = getToolBySlug('json-formatter')!;
         if (treeMode) renderTree();
       });
 
-      document.getElementById('btn-format').addEventListener('click', function () { formatJson(2); });
+      input.addEventListener('paste', function () {
+        setTimeout(function () { formatJson(getIndent()); }, 0);
+      });
+
+      indentSelect.addEventListener('change', function () {
+        if (lastRawOutput) formatJson(getIndent());
+      });
+
+      document.getElementById('btn-format').addEventListener('click', function () { formatJson(getIndent()); });
       document.getElementById('btn-minify').addEventListener('click', function () { formatJson(0); });
       document.getElementById('btn-validate').addEventListener('click', function () {
         var result = parseInput();
-        setStatus(result);
-        if (result.empty) showToast('Input is empty');
-        else if (result.ok) showToast('Valid JSON');
-        else showToast('Invalid JSON');
+        if (result.empty) { shakeInput(); showToast('Input is empty'); return; }
+        if (!result.ok) {
+          var repaired = tryRepair(input.value.trim());
+          if (repaired) {
+            setStatus(repaired);
+            showToast('JSON has issues but can be auto-repaired');
+          } else {
+            setStatus(result);
+            showToast('Invalid JSON');
+          }
+        } else {
+          setStatus(result);
+          showToast('Valid JSON');
+        }
       });
       document.getElementById('btn-copy').addEventListener('click', function () {
-        var text = output.value || input.value;
+        var text = lastRawOutput || input.value;
         if (!text) { showToast('Nothing to copy'); return; }
         copyText(text);
       });
       document.getElementById('btn-clear').addEventListener('click', function () {
-        input.value = ''; output.value = '';
+        input.value = '';
+        setHighlightedOutput('');
         treeEl.innerHTML = '';
+        treeMode = false;
+        lastRawOutput = '';
+        document.getElementById('btn-tree').classList.remove('active');
+        outputPre.style.display = '';
+        treeEl.style.display = 'none';
         setStatus({ ok: true, empty: true });
       });
 
       document.getElementById('btn-tree').addEventListener('click', function () {
         treeMode = !treeMode;
         this.classList.toggle('active', treeMode);
-        output.style.display = treeMode ? 'none' : '';
+        outputPre.style.display = treeMode ? 'none' : '';
         treeEl.style.display = treeMode ? '' : 'none';
         if (treeMode) renderTree();
       });

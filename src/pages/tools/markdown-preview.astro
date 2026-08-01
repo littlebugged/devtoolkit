@@ -12,11 +12,11 @@ Write **Markdown** on the left and see the rendered preview on the right.
 
 - Headings (H1–H3)
 - **Bold** and *italic* text
-- \`inline code\` and code blocks
+- \`Inline code\` and code blocks
 - [Links](https://example.com)
 - Blockquotes and horizontal rules
 
-> This is a blockquote. Great for callouts and notes.
+> This is a blockquote. Great for tips and notes.
 
 ---
 
@@ -29,7 +29,7 @@ function hello() {
 ![Placeholder image](https://via.placeholder.com/150)
 
 1. Ordered lists
-2. Work too
+2. Are supported too
 
 Happy writing!`;
 ---
@@ -49,25 +49,22 @@ Happy writing!`;
   <div slot="info" class="tool-info">
     <h2>How to Use</h2>
     <p>
-      Type or paste Markdown in the left panel. The rendered HTML preview updates in real time on the
-      right. A sample document is pre-loaded so you can see supported syntax immediately.
+      Type or paste Markdown into the left panel. The right panel updates in real time with the rendered HTML preview. A sample document is preloaded so you can see the supported syntax right away.
     </p>
     <h3>Supported Markdown Syntax</h3>
     <p>
-      This previewer supports common Markdown elements: headings (<code>#</code>, <code>##</code>,
-      <code>###</code>), <strong>bold</strong> (<code>**text**</code>), <em>italic</em>
-      (<code>*text*</code>), inline code, fenced code blocks, links, images, unordered and ordered
-      lists, blockquotes (<code>&gt;</code>), horizontal rules (<code>---</code>), and line breaks.
+      This previewer supports common Markdown elements: headings (<code>#</code>, <code>##</code>, <code>###</code>),
+      <strong>bold</strong> (<code>**text**</code>), <em>italic</em> (<code>*text*</code>), inline code, fenced code blocks,
+      links, images, unordered and ordered lists, blockquotes (<code>&gt;</code>), horizontal rules (<code>---</code>), and line breaks.
     </p>
     <h3>Limitations</h3>
     <p>
-      This is a lightweight regex-based parser intended for quick previews — not a full CommonMark
-      implementation. Complex nested structures, tables, and edge cases may not render exactly as they
-      would in a production Markdown engine.
+      This is a lightweight, regex-based parser for quick previews — not a full CommonMark implementation. Complex nested structures,
+      tables, and edge cases may not render exactly like production-grade Markdown engines.
     </p>
     <h3>Privacy</h3>
     <p>
-      Your Markdown is processed entirely in your browser. Nothing is uploaded to any server.
+      Your Markdown is processed entirely in your browser and is never uploaded to any server.
     </p>
   </div>
 

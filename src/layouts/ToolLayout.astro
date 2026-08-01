@@ -5,6 +5,7 @@ import AdNative from '../components/AdNative.astro';
 import AdMobile from '../components/AdMobile.astro';
 import type { Tool } from '../data/tools';
 import { tools } from '../data/tools';
+import Icon from '../components/Icon.astro';
 
 interface Props {
   tool: Tool;
@@ -33,7 +34,7 @@ const structuredData = {
   softwareVersion: '1.0',
   author: {
     '@type': 'Organization',
-    name: 'DevToolKit',
+    name: 'CatToolKit',
     url: Astro.site,
   },
   offers: {
@@ -96,13 +97,13 @@ const breadcrumbData = {
       <slot />
     </div>
 
-    <!-- Middle Ad: Native banner for desktop, mobile banner for mobile -->
+    <!-- Middle Ad -->
     <AdNative id="ad-middle" class="ad-middle ad-desktop-only" />
     <AdMobile id="ad-middle-mobile" class="ad-middle ad-mobile-only" />
 
-    <!-- SEO Content (collapsed by default, search engines still read it) -->
+    <!-- SEO Content -->
     <details class="tool-info-accordion">
-      <summary class="tool-info-toggle">Learn more about this tool</summary>
+      <summary class="tool-info-toggle">Learn more</summary>
       <slot name="info" />
     </details>
 
@@ -116,7 +117,7 @@ const breadcrumbData = {
         <div class="tools-grid">
           {relatedTools.map(rt => (
             <a href={`/tools/${rt.slug}`} class="tool-card">
-              <div class="tool-card-icon">{rt.icon}</div>
+              <div class="tool-card-icon"><Icon name={rt.icon} /></div>
               <h3>{rt.name}</h3>
               <p>{rt.description}</p>
             </a>
