@@ -1,0 +1,17 @@
+name = "fake-ai-chat"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# Durable Objects
+[[durable_objects.bindings]]
+name = "CHAT_LOBBY"
+class_name = "ChatLobby"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ChatLobby"]
+
+# Static assets (frontend)
+[assets]
+directory = "./public"
+binding = "ASSETS"
