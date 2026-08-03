@@ -171,6 +171,15 @@ export const tools: Tool[] = [
     icon: 'code-bracket',
     keywords: ['html entity encoder', 'html entity decoder', 'html encode', 'html special characters', 'html entities'],
   },
+  {
+    slug: 'barcode-generator',
+    name: 'Barcode Generator',
+    description: 'Generate barcodes in batch — sequential or custom list. Export as PDF or PNG.',
+    metaDescription: 'Free online barcode generator. Batch create Code128, EAN-13, and other barcodes. Export to PDF for printing or download as PNG. All client-side.',
+    category: 'generators',
+    icon: 'bars-3',
+    keywords: ['barcode generator', 'batch barcode', 'code128', 'ean13', 'barcode maker', 'print barcodes', 'barcode to pdf'],
+  },
 ];
 
 export function getToolsByCategory(categoryId: string): Tool[] {

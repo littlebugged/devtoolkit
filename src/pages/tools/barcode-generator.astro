@@ -1,0 +1,334 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug } from '../../data/tools';
+
+const tool = getToolBySlug('barcode-generator')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="tool-controls">
+    <div class="bc-row">
+      <label for="bc-type">Barcode Type</label>
+      <select id="bc-type">
+        <option value="CODE128" selected>Code 128 (alphanumeric)</option>
+        <option value="EAN13">EAN-13 (13 digits)</option>
+        <option value="EAN8">EAN-8 (8 digits)</option>
+        <option value="UPC">UPC-A (12 digits)</option>
+        <option value="CODE39">Code 39</option>
+        <option value="ITF14">ITF-14 (14 digits)</option>
+        <option value="pharmacode">Pharmacode</option>
+      </select>
+    </div>
+
+    <div class="bc-row">
+      <label>Input Mode</label>
+      <div class="bc-mode-tabs">
+        <button type="button" class="btn btn-sm bc-mode-btn active" data-mode="sequential">Sequential</button>
+        <button type="button" class="btn btn-sm bc-mode-btn" data-mode="custom">Custom List</button>
+      </div>
+    </div>
+
+    <div id="mode-sequential" class="bc-mode-panel">
+      <div class="bc-grid">
+        <div>
+          <label for="bc-prefix">Prefix</label>
+          <input type="text" id="bc-prefix" placeholder="e.g. PROD-" value="ITEM-" />
+        </div>
+        <div>
+          <label for="bc-start">Start Number</label>
+          <input type="number" id="bc-start" value="1" min="0" />
+        </div>
+        <div>
+          <label for="bc-count">Quantity</label>
+          <input type="number" id="bc-count" value="10" min="1" max="500" />
+        </div>
+        <div>
+          <label for="bc-pad">Digit Padding</label>
+          <input type="number" id="bc-pad" value="3" min="1" max="10" />
+        </div>
+      </div>
+      <p class="bc-hint">Preview: <code id="bc-preview-text">ITEM-001, ITEM-002, ... ITEM-010</code></p>
+    </div>
+
+    <div id="mode-custom" class="bc-mode-panel" style="display:none">
+      <label for="bc-list">One value per line</label>
+      <textarea id="bc-list" rows="6" placeholder="ABC-001&#10;ABC-002&#10;XYZ-100"></textarea>
+    </div>
+
+    <div class="bc-row bc-export-row">
+      <div>
+        <label for="bc-size">Export Size</label>
+        <select id="bc-size">
+          <option value="small">Small (200×80)</option>
+          <option value="medium" selected>Medium (300×120)</option>
+          <option value="large">Large (400×160)</option>
+          <option value="xlarge">X-Large (500×200)</option>
+        </select>
+      </div>
+      <div>
+        <label for="bc-show-text">Show Text</label>
+        <select id="bc-show-text">
+          <option value="yes" selected>Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="bc-actions">
+      <button type="button" class="btn btn-primary" id="btn-generate">Generate</button>
+      <button type="button" class="btn" id="btn-pdf" disabled>Export PDF</button>
+      <button type="button" class="btn" id="btn-png" disabled>Export PNG (ZIP)</button>
+    </div>
+  </div>
+
+  <div id="bc-status" class="bc-status"></div>
+  <div id="bc-output" class="bc-output"></div>
+
+  <div slot="info" class="tool-info">
+    <h2>Batch Barcode Generator</h2>
+    <p>Generate barcodes in bulk using sequential numbering or a custom list. All processing happens in your browser — your data never leaves your device.</p>
+    <h3>Supported Formats</h3>
+    <p>Code 128 (most versatile, supports letters + numbers), EAN-13/EAN-8 (retail products), UPC-A (US retail), Code 39, ITF-14 (shipping cartons), and Pharmacode.</p>
+    <h3>Export Options</h3>
+    <p>Export as PDF for direct printing (barcodes arranged in a grid layout) or as a ZIP file containing individual PNG images. Choose from 4 size presets.</p>
+  </div>
+</ToolLayout>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<script is:inline>
+(function() {
+  var typeEl = document.getElementById('bc-type');
+  var prefixEl = document.getElementById('bc-prefix');
+  var startEl = document.getElementById('bc-start');
+  var countEl = document.getElementById('bc-count');
+  var padEl = document.getElementById('bc-pad');
+  var listEl = document.getElementById('bc-list');
+  var sizeEl = document.getElementById('bc-size');
+  var showTextEl = document.getElementById('bc-show-text');
+  var previewEl = document.getElementById('bc-preview-text');
+  var statusEl = document.getElementById('bc-status');
+  var outputEl = document.getElementById('bc-output');
+  var btnGen = document.getElementById('btn-generate');
+  var btnPdf = document.getElementById('btn-pdf');
+  var btnPng = document.getElementById('btn-png');
+  var modeBtns = document.querySelectorAll('.bc-mode-btn');
+  var currentMode = 'sequential';
+  var generated = [];
+
+  var sizes = {
+    small:  { w: 200, h: 80 },
+    medium: { w: 300, h: 120 },
+    large:  { w: 400, h: 160 },
+    xlarge: { w: 500, h: 200 }
+  };
+
+  modeBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      currentMode = btn.dataset.mode;
+      modeBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('mode-sequential').style.display = currentMode === 'sequential' ? '' : 'none';
+      document.getElementById('mode-custom').style.display = currentMode === 'custom' ? '' : 'none';
+    });
+  });
+
+  function updatePreview() {
+    var prefix = prefixEl.value;
+    var start = parseInt(startEl.value) || 0;
+    var count = parseInt(countEl.value) || 1;
+    var pad = parseInt(padEl.value) || 3;
+    var first = prefix + String(start).padStart(pad, '0');
+    var last = prefix + String(start + count - 1).padStart(pad, '0');
+    previewEl.textContent = first + ', ' + prefix + String(start + 1).padStart(pad, '0') + ', ... ' + last;
+  }
+
+  [prefixEl, startEl, countEl, padEl].forEach(function(el) {
+    el.addEventListener('input', updatePreview);
+  });
+  updatePreview();
+
+  function getValues() {
+    if (currentMode === 'sequential') {
+      var prefix = prefixEl.value;
+      var start = parseInt(startEl.value) || 0;
+      var count = Math.min(parseInt(countEl.value) || 1, 500);
+      var pad = parseInt(padEl.value) || 3;
+      var vals = [];
+      for (var i = 0; i < count; i++) {
+        vals.push(prefix + String(start + i).padStart(pad, '0'));
+      }
+      return vals;
+    } else {
+      return listEl.value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+    }
+  }
+
+  function getSize() {
+    return sizes[sizeEl.value] || sizes.medium;
+  }
+
+  function renderBarcode(value, w, h, showText) {
+    var canvas = document.createElement('canvas');
+    try {
+      JsBarcode(canvas, value, {
+        format: typeEl.value,
+        width: 2,
+        height: Math.round(h * 0.65),
+        displayValue: showText,
+        fontSize: Math.max(12, Math.round(h * 0.12)),
+        margin: 10,
+        background: '#ffffff',
+        lineColor: '#000000'
+      });
+    } catch (e) {
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#e74c3c';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Error: ' + e.message, w / 2, h / 2);
+    }
+    return canvas;
+  }
+
+  btnGen.addEventListener('click', function() {
+    var values = getValues();
+    if (values.length === 0) {
+      statusEl.textContent = 'No values to generate.';
+      statusEl.className = 'bc-status bc-error';
+      return;
+    }
+    if (values.length > 500) {
+      statusEl.textContent = 'Maximum 500 barcodes at once.';
+      statusEl.className = 'bc-status bc-error';
+      return;
+    }
+
+    var sz = getSize();
+    var showText = showTextEl.value === 'yes';
+    generated = [];
+    outputEl.innerHTML = '';
+
+    var errors = 0;
+    values.forEach(function(val) {
+      var canvas = renderBarcode(val, sz.w, sz.h, showText);
+      generated.push({ value: val, canvas: canvas });
+
+      var wrap = document.createElement('div');
+      wrap.className = 'bc-item';
+      wrap.appendChild(canvas);
+      var label = document.createElement('span');
+      label.className = 'bc-label';
+      label.textContent = val;
+      wrap.appendChild(label);
+      outputEl.appendChild(wrap);
+    });
+
+    statusEl.textContent = 'Generated ' + values.length + ' barcode' + (values.length > 1 ? 's' : '') + '.';
+    statusEl.className = 'bc-status bc-success';
+    btnPdf.disabled = false;
+    btnPng.disabled = false;
+  });
+
+  btnPdf.addEventListener('click', function() {
+    if (generated.length === 0) return;
+
+    var sz = getSize();
+    var pdf = new jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    var pageW = 210, pageH = 297;
+    var margin = 10;
+    var bw = sz.w * 0.26;
+    var bh = sz.h * 0.26;
+    var cols = Math.floor((pageW - margin * 2) / (bw + 4));
+    var rows = Math.floor((pageH - margin * 2) / (bh + 4));
+    if (cols < 1) cols = 1;
+    if (rows < 1) rows = 1;
+    var perPage = cols * rows;
+
+    generated.forEach(function(item, i) {
+      if (i > 0 && i % perPage === 0) pdf.addPage();
+      var page_i = i % perPage;
+      var col = page_i % cols;
+      var row = Math.floor(page_i / cols);
+      var x = margin + col * (bw + 4);
+      var y = margin + row * (bh + 4);
+      var imgData = item.canvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', x, y, bw, bh);
+    });
+
+    pdf.save('barcodes.pdf');
+  });
+
+  btnPng.addEventListener('click', function() {
+    if (generated.length === 0) return;
+
+    if (generated.length === 1) {
+      var link = document.createElement('a');
+      link.download = generated[0].value + '.png';
+      link.href = generated[0].canvas.toDataURL('image/png');
+      link.click();
+      return;
+    }
+
+    var zip = new JSZip();
+    var promises = generated.map(function(item, i) {
+      return new Promise(function(resolve) {
+        item.canvas.toBlob(function(blob) {
+          zip.file(item.value.replace(/[^a-zA-Z0-9_-]/g, '_') + '.png', blob);
+          resolve();
+        });
+      });
+    });
+
+    Promise.all(promises).then(function() {
+      return zip.generateAsync({ type: 'blob' });
+    }).then(function(blob) {
+      var link = document.createElement('a');
+      link.download = 'barcodes.zip';
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+  });
+})();
+</script>
+
+<style>
+  .bc-row { margin-bottom: 1rem; }
+  .bc-row label { display: block; font-weight: 600; font-size: 0.85rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.35rem; }
+  .bc-row select, .bc-row input { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); font-size: 0.95rem; }
+  .bc-mode-tabs { display: flex; gap: 0.5rem; }
+  .bc-mode-btn { padding: 0.45rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+  .bc-mode-btn.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+  .bc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .bc-grid label { font-weight: 600; font-size: 0.8rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; display: block; }
+  .bc-grid input { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); font-size: 0.95rem; }
+  .bc-hint { font-size: 0.82rem; color: var(--color-text-muted); margin-top: 0.5rem; }
+  .bc-hint code { background: var(--color-bg-alt); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.8rem; }
+  #bc-list { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); font-family: var(--font-mono); font-size: 0.9rem; resize: vertical; }
+  .bc-export-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .bc-export-row label { font-weight: 600; font-size: 0.8rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; display: block; }
+  .bc-export-row select { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); font-size: 0.95rem; }
+  .bc-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  .bc-status { padding: 0.6rem 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; margin-top: 0.75rem; }
+  .bc-status:empty { display: none; }
+  .bc-success { background: var(--color-success-bg, #ecfdf5); color: var(--color-success, #065f46); }
+  .bc-error { background: #fef2f2; color: #991b1b; }
+  .bc-output { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .bc-item { text-align: center; background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 0.75rem; }
+  .bc-item canvas { max-width: 100%; height: auto; }
+  .bc-label { display: block; font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.35rem; word-break: break-all; }
+
+  @media (max-width: 600px) {
+    .bc-grid { grid-template-columns: 1fr; }
+    .bc-export-row { grid-template-columns: 1fr; }
+    .bc-output { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  }
+</style>
+</ToolLayout>
