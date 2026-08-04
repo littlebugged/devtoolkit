@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Contact"
+  description="Get in touch with the CatToolKit team — report bugs, suggest tools, or just say hello."
+>
+  <div class="tool-page">
+    <div class="tool-header">
+      <h1>Contact Us</h1>
+    </div>
+
+    <div class="tool-info">
+      <h2>We'd love to hear from you</h2>
+      <p>Whether you've found a bug, have a feature request, or just want to say hi — we're all ears (cat ears, naturally).</p>
+
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="contact-icon">📧</div>
+          <h3>Email</h3>
+          <p>For general inquiries, feedback, or support:</p>
+          <a href="mailto:hello@xxmind.cc.cd" class="contact-link">hello@xxmind.cc.cd</a>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-icon">🐙</div>
+          <h3>GitHub</h3>
+          <p>Report bugs or request features via issues:</p>
+          <a href="https://github.com/littlebugged/devtoolkit" target="_blank" rel="noopener" class="contact-link">github.com/littlebugged/devtoolkit</a>
+        </div>
+      </div>
+
+      <h3>Response Time</h3>
+      <p>We typically respond within 1–2 business days. Bug reports with reproduction steps get priority.</p>
+
+      <h3>Privacy Note</h3>
+      <p>We don't collect personal data through our tools. If you email us, we'll only use your address to reply. See our <a href="/privacy">Privacy Policy</a> for details.</p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .contact-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 12px);
+    padding: 1.5rem;
+    text-align: center;
+    transition: box-shadow 0.2s;
+  }
+  .contact-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .contact-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  .contact-card h3 {
+    margin: 0.25rem 0 0.5rem;
+    font-size: 1.1rem;
+  }
+  .contact-card p {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+  }
+  .contact-link {
+    display: inline-block;
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    word-break: break-all;
+  }
+</style>

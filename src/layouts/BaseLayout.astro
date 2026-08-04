@@ -121,10 +121,43 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
       <ul class="footer-links">
         <li><a href="/">All Tools</a></li>
         <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
         <li><a href="/privacy">Privacy Policy</a></li>
       </ul>
     </div>
   </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-consent" class="cookie-consent" style="display:none">
+    <div class="cookie-inner">
+      <p>We use cookies for ads (Google AdSense). Your tool data stays local and is never collected. <a href="/privacy">Privacy Policy</a></p>
+      <div class="cookie-btns">
+        <button type="button" class="btn btn-primary cookie-accept">Accept</button>
+        <button type="button" class="btn cookie-decline">Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    (function() {
+      var KEY = 'cattoolkit-cookie-consent';
+      var banner = document.getElementById('cookie-consent');
+      var consent = localStorage.getItem(KEY);
+
+      if (!consent) {
+        banner.style.display = '';
+      }
+
+      banner.querySelector('.cookie-accept').addEventListener('click', function() {
+        localStorage.setItem(KEY, 'accepted');
+        banner.style.display = 'none';
+      });
+      banner.querySelector('.cookie-decline').addEventListener('click', function() {
+        localStorage.setItem(KEY, 'declined');
+        banner.style.display = 'none';
+      });
+    })();
+  </script>
 
   <!-- Copy Toast notification -->
   <div id="copy-toast" class="copy-toast">Copied!</div>
